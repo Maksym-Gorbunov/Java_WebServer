@@ -17,8 +17,6 @@ import static se.iths.mhb.server.Server.METHOD_NOT_SUPPORTED;
 public class ClientHandler implements Runnable {
 
 
-
-
     private final Socket connect;
     private final Map<String, HttpService> plugins;
 
@@ -133,6 +131,8 @@ public class ClientHandler implements Runnable {
             return "text/javascript";
         if (fileRequested.endsWith(".json"))
             return "application/json";
+        if (fileRequested.endsWith(".ico"))
+            return "image/vnd.microsoft.icon";
         else
             return "text/plain";
 

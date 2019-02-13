@@ -4,13 +4,14 @@ import se.iths.mhb.http.HttpService;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
 
 public class Server {
 
@@ -32,6 +33,7 @@ public class Server {
 
     public void start() {
         setMapping("/", staticFileService);
+        startStaticFileListener();
         startPluginListener();
         ServerSocket serverConnect = null;
         try {
@@ -62,7 +64,42 @@ public class Server {
 
     }
 
+    private URLClassLoader createClassLoader(String fileLocation) {
+        File loc = new File(fileLocation);
+
+        File[] flist = loc.listFiles(file -> file.getPath().toLowerCase().endsWith(".jar"));
+
+        URL[] urls = new URL[flist.length];
+        for (int i = 0; i < flist.length; i++) {
+            try {
+                urls[i] = flist[i].toURI().toURL();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
+        return new URLClassLoader(urls);
+    }
+
+
     private void startPluginListener() {
+        System.out.println("Loading Plugins");
+        URLClassLoader ucl = createClassLoader("Plugins");
+
+
+        ServiceLoader<HttpService> loader =
+                ServiceLoader.load(HttpService.class, ucl);
+
+        for (HttpService httpService : loader) {
+
+            setMapping(httpService.defaultMapping(), httpService);
+
+        }
+
+        //loader.forEach(System.out::println);
+    }
+
+
+    private void startStaticFileListener() {
         CompletableFuture.runAsync(() -> {
             while (true) {
                 File[] files = Server.WEB_ROOT.listFiles(File::isFile);

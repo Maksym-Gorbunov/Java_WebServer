@@ -14,7 +14,11 @@ public class StaticFileService implements HttpService {
 
     public StaticFileService(Server server) {
         this.server = server;
-        System.out.println(server);
+    }
+
+    @Override
+    public String defaultMapping() {
+        return "/";
     }
 
     @Override
