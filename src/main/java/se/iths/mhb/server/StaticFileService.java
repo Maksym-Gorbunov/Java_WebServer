@@ -6,7 +6,7 @@ import se.iths.mhb.http.HttpService;
 
 import java.io.IOException;
 
-import static se.iths.mhb.server.ClientHandler.DEFAULT_FILE;
+import static se.iths.mhb.server.Server.DEFAULT_FILE;
 
 public class StaticFileService implements HttpService {
 
@@ -22,8 +22,10 @@ public class StaticFileService implements HttpService {
         String fileRequested = httpRequest.getMapping();
         if (httpRequest.getMapping().endsWith("/")) {
             fileRequested += DEFAULT_FILE;
+        } else {
+            fileRequested = fileRequested.replaceFirst("/", "");
         }
-
+        System.out.println(fileRequested);
         return ClientHandler.response(200, fileRequested, httpRequest);
 
     }

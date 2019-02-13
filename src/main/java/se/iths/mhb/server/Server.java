@@ -2,14 +2,23 @@ package se.iths.mhb.server;
 
 import se.iths.mhb.http.HttpService;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class Server {
+
+    static final File WEB_ROOT = new File("WEB-ROOT/static");
+    static final String DEFAULT_FILE = "index.html";
+    static final String FILE_NOT_FOUND = "404.html";
+    static final String METHOD_NOT_SUPPORTED = "501.html";
+
 
     private final int port;
     private Plugins plugins;
@@ -22,10 +31,8 @@ public class Server {
     }
 
     public void start() {
-        startPluginListener();
-        setMapping("/index.html", staticFileService);
         setMapping("/", staticFileService);
-        setMapping("/laboration1.pdf", staticFileService);
+        startPluginListener();
         ServerSocket serverConnect = null;
         try {
             serverConnect = new ServerSocket(port);
@@ -57,7 +64,18 @@ public class Server {
 
     private void startPluginListener() {
         CompletableFuture.runAsync(() -> {
-            //
+            while (true) {
+                File[] files = Server.WEB_ROOT.listFiles(File::isFile);
+                List<String> strings = Arrays.stream(files).map(file -> "/" + file.getName().toLowerCase()).collect(Collectors.toList());
+                setMappings(strings, staticFileService);
+
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
 
         });
     }

@@ -8,18 +8,16 @@ import se.iths.mhb.http.Method;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.Date;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import static se.iths.mhb.server.Server.FILE_NOT_FOUND;
+import static se.iths.mhb.server.Server.METHOD_NOT_SUPPORTED;
+
 public class ClientHandler implements Runnable {
 
-    static final File WEB_ROOT = new File("WEB-ROOT/static");
-    static final String DEFAULT_FILE = "index.html";
-    static final String FILE_NOT_FOUND = "404.html";
-    static final String METHOD_NOT_SUPPORTED = "501.html";
 
-    static final int PORT = 8091;
+
 
     private final Socket connect;
     private final Map<String, HttpService> plugins;
@@ -74,8 +72,9 @@ public class ClientHandler implements Runnable {
     private HttpRequest parseInput(BufferedReader in) throws IOException {
 
         String input = in.readLine();
-
-        System.out.println("input [[[[[[  " + input + "  ]]]]]]]]]] input");
+        //todo Ändra så att alla raderna läses in och parsas
+        //todo headers osv
+        System.out.println("input [ " + input + " ]");
 
         StringTokenizer parse = new StringTokenizer(input);
         String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
@@ -98,7 +97,7 @@ public class ClientHandler implements Runnable {
     private void send(PrintWriter out, BufferedOutputStream dataOut, HttpResponse httpResponse) throws IOException {
         out.println(httpResponse.getStatusLine());
 
-        httpResponse.getHeaders().forEach((key, value) -> out.println(key+": " + value));
+        httpResponse.getHeaders().forEach((key, value) -> out.println(key + ": " + value));
         out.println();
         out.flush();
 
@@ -140,7 +139,7 @@ public class ClientHandler implements Runnable {
     }
 
     public static HttpResponse response(int code, String fileRequested, HttpRequest httpRequest) throws IOException {
-        File file = new File(WEB_ROOT, fileRequested);
+        File file = new File(Server.WEB_ROOT, fileRequested);
         int fileLength = (int) file.length();
         String content = getContentType(fileRequested);
         byte[] body = readFileData(file, fileLength);
