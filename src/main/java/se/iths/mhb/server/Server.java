@@ -66,9 +66,9 @@ public class Server {
         plugins = plugins.addPlugin(httpService.defaultMapping(), httpService);
     }
 
-    private void loadConfig() {
-
-    }
+//    private void loadConfig() {
+//
+//    }
 
     private URLClassLoader createClassLoader(String fileLocation) {
         File loc = new File(fileLocation);
@@ -88,6 +88,7 @@ public class Server {
 
 
     private void startPluginListener() {
+        //todo Add a thread with wastchservice to check plugins directory
         System.out.println("Loading Plugins");
         URLClassLoader ucl = createClassLoader("Plugins");
 

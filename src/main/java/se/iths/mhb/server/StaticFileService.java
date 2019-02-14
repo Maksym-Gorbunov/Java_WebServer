@@ -5,6 +5,7 @@ import se.iths.mhb.http.HttpResponse;
 import se.iths.mhb.http.HttpService;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -15,7 +16,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.*;
-import static se.iths.mhb.server.Server.DEFAULT_FILE;
+import static se.iths.mhb.http.HttpUtils.getContentType;
+import static se.iths.mhb.server.Server.*;
 
 public class StaticFileService implements HttpService, Runnable {
 
@@ -39,9 +41,52 @@ public class StaticFileService implements HttpService, Runnable {
             fileRequested = fileRequested.replaceFirst("/", "");
         }
         System.out.println(fileRequested);
-        return ClientHandler.response(200, fileRequested, httpRequest);
+        return response(200, fileRequested, httpRequest);
 
     }
+
+
+    public static HttpResponse response(int code, String fileRequested, HttpRequest httpRequest) throws IOException {
+        File file = new File(Server.WEB_ROOT, fileRequested);
+        int fileLength = (int) file.length();
+        String content = getContentType(fileRequested);
+        byte[] body = readFileData(file, fileLength);
+
+        return HttpResponse.newBuilder()
+                .statusCode(code)
+                .setHeader("Content-type", content)
+                .setHeader("Content-length", "" + fileLength)
+                .mapping(httpRequest.getMapping())
+                .body(body)
+                .build();
+
+    }
+
+    public static HttpResponse errorResponse(int code, HttpRequest httpRequest) throws IOException {
+        String fileRequested = "";
+        switch (code) {
+            case 404:
+                fileRequested = FILE_NOT_FOUND;
+                break;
+            case 501:
+                fileRequested = METHOD_NOT_SUPPORTED;
+                break;
+        }
+        return response(code, fileRequested, httpRequest);
+    }
+
+    public static byte[] readFileData(File file, int fileLength) throws IOException {
+        byte[] fileData = new byte[fileLength];
+
+        try (var fileIn = new FileInputStream(file)) {
+            fileIn.read(fileData);
+        }
+        return fileData;
+    }
+
+//    public static String readFile(File file) throws IOException {
+//        return Files.readString(file.toPath());
+//    }
 
     private void loadAllStaticFiles() {
         File[] files = Server.WEB_ROOT.listFiles(File::isFile);

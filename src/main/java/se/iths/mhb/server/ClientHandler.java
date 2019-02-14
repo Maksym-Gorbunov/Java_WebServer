@@ -7,12 +7,10 @@ import se.iths.mhb.http.Method;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import static se.iths.mhb.server.Server.FILE_NOT_FOUND;
-import static se.iths.mhb.server.Server.METHOD_NOT_SUPPORTED;
+import static se.iths.mhb.server.StaticFileService.errorResponse;
 
 public class ClientHandler implements Runnable {
 
@@ -103,68 +101,14 @@ public class ClientHandler implements Runnable {
         dataOut.flush();
     }
 
-    public static String readFile(File file) throws IOException {
-        return Files.readString(file.toPath());
-    }
-
-    public static byte[] readFileData(File file, int fileLength) throws IOException {
-        byte[] fileData = new byte[fileLength];
-
-        try (var fileIn = new FileInputStream(file)) {
-            fileIn.read(fileData);
-        }
-        return fileData;
-    }
-
-    // return supported MIME Types
-    public static String getContentType(String fileRequested) {
-        if (fileRequested.endsWith(".htm") || fileRequested.endsWith(".html"))
-            return "text/html";
 
 
-        if (fileRequested.endsWith(".css"))
-            return "text/css";
 
-        if (fileRequested.endsWith(".pdf"))
-            return "application/pdf";
-        if (fileRequested.endsWith(".js"))
-            return "text/javascript";
-        if (fileRequested.endsWith(".json"))
-            return "application/json";
-        if (fileRequested.endsWith(".ico"))
-            return "image/vnd.microsoft.icon";
-        else
-            return "text/plain";
 
-    }
 
-    public static HttpResponse response(int code, String fileRequested, HttpRequest httpRequest) throws IOException {
-        File file = new File(Server.WEB_ROOT, fileRequested);
-        int fileLength = (int) file.length();
-        String content = getContentType(fileRequested);
-        byte[] body = readFileData(file, fileLength);
 
-        return HttpResponse.newBuilder()
-                .statusCode(code)
-                .setHeader("Content-type", content)
-                .setHeader("Content-length", "" + fileLength)
-                .mapping(httpRequest.getMapping())
-                .body(body)
-                .build();
 
-    }
 
-    public static HttpResponse errorResponse(int code, HttpRequest httpRequest) throws IOException {
-        String fileRequested = "";
-        switch (code) {
-            case 404:
-                fileRequested = FILE_NOT_FOUND;
-                break;
-            case 501:
-                fileRequested = METHOD_NOT_SUPPORTED;
-                break;
-        }
-        return response(code, fileRequested, httpRequest);
-    }
+
 
 }
