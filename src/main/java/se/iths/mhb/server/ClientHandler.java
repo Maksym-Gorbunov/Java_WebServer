@@ -16,11 +16,11 @@ public class ClientHandler implements Runnable {
 
 
     private final Socket connect;
-    private final Map<String, HttpService> plugins;
+    private final Map<String, HttpService> serviceMap;
 
-    public ClientHandler(Socket connect, Map<String, HttpService> plugins) {
+    public ClientHandler(Socket connect, Map<String, HttpService> serviceMap) {
         this.connect = connect;
-        this.plugins = plugins;
+        this.serviceMap = serviceMap;
     }
 
     @Override
@@ -31,13 +31,13 @@ public class ClientHandler implements Runnable {
             System.out.println(httpRequest.toString());
             HttpResponse httpResponse = null;
             try {
-                if (httpRequest.getMethod() == Method.GET) {
-                    HttpService httpService = plugins.get(httpRequest.getMapping());
-                    if (httpService != null)
-                        httpResponse = httpService.serve(httpRequest);
-                } else {
-                    httpResponse = errorResponse(501, httpRequest);
-                }
+                //if (httpRequest.getMethod() == Method.GET) {
+                HttpService httpService = serviceMap.get(httpRequest.getMapping());
+
+                httpResponse = (httpService == null) ? errorResponse(404, httpRequest) : httpService.serve(httpRequest);
+                //} else {
+                //    httpResponse = errorResponse(501, httpRequest);
+                //}
             } catch (FileNotFoundException e) {
                 System.out.println("Error with file not found");
                 httpResponse = errorResponse(404, httpRequest);
@@ -70,7 +70,6 @@ public class ClientHandler implements Runnable {
         String input = in.readLine();
         //todo Ändra så att alla raderna läses in och parsas
         //todo headers osv
-        System.out.println("input [ " + input + " ]");
 
         StringTokenizer parse = new StringTokenizer(input);
         String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
@@ -100,15 +99,6 @@ public class ClientHandler implements Runnable {
         dataOut.write(httpResponse.getBody(), 0, httpResponse.getBody().length);
         dataOut.flush();
     }
-
-
-
-
-
-
-
-
-
 
 
 }

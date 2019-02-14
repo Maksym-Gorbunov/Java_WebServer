@@ -4,14 +4,10 @@ import se.iths.mhb.http.HttpService;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.ServerSocket;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -24,27 +20,24 @@ public class Server {
 
 
     private final int port;
-    private Plugins plugins;
-    private final StaticFileService staticFileService;
+    private Mappings mappings;
 
     public Server(int port) {
         this.port = port;
-        this.plugins = new Plugins();
-        this.staticFileService = new StaticFileService(this);
+        this.mappings = new Mappings();
     }
 
     public void start() {
-        setMapping("/", staticFileService);
+        //todo read some config file for port and if specify plugin to specific mapping
         startStaticFileListener();
         startPluginListener();
-        ServerSocket serverConnect = null;
         try {
-            serverConnect = new ServerSocket(port);
+            ServerSocket serverConnect = new ServerSocket(port);
             System.out.println("Server started.\nListening for connections on port : " + port + " ...\n");
 
             while (true) {
                 System.out.println("Connection opened. (" + new Date() + ")");
-                CompletableFuture.runAsync(new ClientHandler(serverConnect.accept(), plugins.getPlugins()));
+                CompletableFuture.runAsync(new ClientHandler(serverConnect.accept(), mappings.getServiceMap()));
             }
         } catch (IOException e) {
             System.err.println("Server Connection error : " + e.getMessage());
@@ -52,57 +45,32 @@ public class Server {
 
     }
 
-    public synchronized void setMappings(List<String> mappings, HttpService httpService) {
+    public synchronized void setMappings(List<String> mappingList, HttpService httpService) {
         HashMap<String, HttpService> hashMap = new HashMap<>();
-        mappings.forEach(mapping -> hashMap.put(mapping, httpService));
-        plugins = plugins.addPlugins(hashMap);
+        mappingList.forEach(mapping -> hashMap.put(mapping, httpService));
+        mappings = mappings.addServices(hashMap);
     }
 
     public synchronized void setMapping(String mapping, HttpService httpService) {
-        plugins = plugins.addPlugin(mapping, httpService);
+        mappings = mappings.addService(mapping, httpService);
     }
 
     public synchronized void setDefaultMapping(HttpService httpService) {
-        plugins = plugins.addPlugin(httpService.defaultMapping(), httpService);
+        mappings = mappings.addService(httpService.defaultMapping(), httpService);
     }
-
-//    private void loadConfig() {
-//
-//    }
-
-    private URLClassLoader createClassLoader(String fileLocation) {
-        File loc = new File(fileLocation);
-
-        File[] flist = loc.listFiles(file -> file.getPath().toLowerCase().endsWith(".jar"));
-
-        URL[] urls = new URL[flist.length];
-        for (int i = 0; i < flist.length; i++) {
-            try {
-                urls[i] = flist[i].toURI().toURL();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }
-        return new URLClassLoader(urls);
-    }
-
 
     private void startPluginListener() {
-        //todo Add a thread with wastchservice to check plugins directory
-        System.out.println("Loading Plugins");
-        URLClassLoader ucl = createClassLoader("Plugins");
-
-        ServiceLoader<HttpService> loader = ServiceLoader.load(HttpService.class, ucl);
-
-        loader.forEach(this::setDefaultMapping);
-    }
-
-
-    private void startStaticFileListener() {
-        Thread thread = new Thread(staticFileService);
+        PluginHandler pluginHandler = new PluginHandler(this, "Plugins");
+        Thread thread = new Thread(pluginHandler);
         thread.setDaemon(true);
         thread.start();
     }
 
+    private void startStaticFileListener() {
+        StaticFileService staticFileService = new StaticFileService(this);
+        Thread thread = new Thread(staticFileService);
+        thread.setDaemon(true);
+        thread.start();
+    }
 
 }

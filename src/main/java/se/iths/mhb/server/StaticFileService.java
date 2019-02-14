@@ -7,10 +7,7 @@ import se.iths.mhb.http.HttpService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
+import java.nio.file.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -96,6 +93,8 @@ public class StaticFileService implements HttpService, Runnable {
 
     @Override
     public void run() {
+        System.out.println("Init Static files");
+        server.setMapping("/", this);
         loadAllStaticFiles();
 
         try {
@@ -109,7 +108,11 @@ public class StaticFileService implements HttpService, Runnable {
 
             WatchKey key;
             while ((key = watchService.take()) != null) {
+                System.out.println("Reloading static files");
                 loadAllStaticFiles();
+                for (WatchEvent<?> event : key.pollEvents()) {
+
+                }
                 key.reset();
                 //todo maybe change to one file at a time
                 /*
