@@ -8,9 +8,11 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ServiceLoader;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 
 public class Server {
@@ -60,6 +62,10 @@ public class Server {
         plugins = plugins.addPlugin(mapping, httpService);
     }
 
+    public synchronized void setDefaultMapping(HttpService httpService) {
+        plugins = plugins.addPlugin(httpService.defaultMapping(), httpService);
+    }
+
     private void loadConfig() {
 
     }
@@ -85,36 +91,16 @@ public class Server {
         System.out.println("Loading Plugins");
         URLClassLoader ucl = createClassLoader("Plugins");
 
+        ServiceLoader<HttpService> loader = ServiceLoader.load(HttpService.class, ucl);
 
-        ServiceLoader<HttpService> loader =
-                ServiceLoader.load(HttpService.class, ucl);
-
-        for (HttpService httpService : loader) {
-
-            setMapping(httpService.defaultMapping(), httpService);
-
-        }
-
-        //loader.forEach(System.out::println);
+        loader.forEach(this::setDefaultMapping);
     }
 
 
     private void startStaticFileListener() {
-        CompletableFuture.runAsync(() -> {
-            while (true) {
-                File[] files = Server.WEB_ROOT.listFiles(File::isFile);
-                List<String> strings = Arrays.stream(files).map(file -> "/" + file.getName().toLowerCase()).collect(Collectors.toList());
-                setMappings(strings, staticFileService);
-
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-        });
+        Thread thread = new Thread(staticFileService);
+        thread.setDaemon(true);
+        thread.start();
     }
 
 
