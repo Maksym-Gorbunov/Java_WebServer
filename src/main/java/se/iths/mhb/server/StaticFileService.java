@@ -1,5 +1,6 @@
 package se.iths.mhb.server;
 
+import se.iths.mhb.http.Http;
 import se.iths.mhb.http.HttpRequest;
 import se.iths.mhb.http.HttpResponse;
 import se.iths.mhb.http.HttpService;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.*;
-import static se.iths.mhb.http.HttpUtils.getContentType;
 import static se.iths.mhb.server.Server.*;
 
 public class StaticFileService implements HttpService, Runnable {
@@ -46,7 +46,7 @@ public class StaticFileService implements HttpService, Runnable {
     public static HttpResponse response(int code, String fileRequested, HttpRequest httpRequest) throws IOException {
         File file = new File(Server.WEB_ROOT, fileRequested);
         int fileLength = (int) file.length();
-        String content = getContentType(fileRequested);
+        String content = Http.getContentType(fileRequested.substring(fileRequested.lastIndexOf(".")));
         byte[] body = readFileData(file, fileLength);
 
         return HttpResponse.newBuilder()

@@ -7,14 +7,14 @@ import java.util.TreeMap;
 public class HttpResponse {
 
 
-    private final Method method;
+    private final Http.Method method;
     private final String statusLine;
     private final String mapping;
     private final Map<String, String> headers;
     private final Map<String, String> parameters;
     private final byte[] body;
 
-    private HttpResponse(Method method, String statusLine, String mapping, Map<String, String> headers, Map<String, String> parameters, byte[] body) {
+    private HttpResponse(Http.Method method, String statusLine, String mapping, Map<String, String> headers, Map<String, String> parameters, byte[] body) {
         this.method = method;
         this.statusLine = statusLine;
         this.mapping = mapping;
@@ -23,7 +23,7 @@ public class HttpResponse {
         this.body = body;
     }
 
-    public Method getMethod() {
+    public Http.Method getMethod() {
         return method;
     }
 
@@ -65,7 +65,7 @@ public class HttpResponse {
 
     public static class Builder {
 
-        private Method method = Method.GET;
+        private Http.Method method = Http.Method.GET;
         private String statusLine = "Http/1.1";
         private String mapping = "/";
         private Map<String, String> headers = new TreeMap<>();
@@ -77,7 +77,7 @@ public class HttpResponse {
             headers.put("Date", new Date().toString());
         }
 
-        public HttpResponse.Builder method(Method method) {
+        public HttpResponse.Builder method(Http.Method method) {
             this.method = method;
             return this;
         }

@@ -1,9 +1,9 @@
 package se.iths.mhb.server;
 
+import se.iths.mhb.http.Http;
 import se.iths.mhb.http.HttpRequest;
 import se.iths.mhb.http.HttpResponse;
 import se.iths.mhb.http.HttpService;
-import se.iths.mhb.http.Method;
 
 import java.io.*;
 import java.net.Socket;
@@ -83,7 +83,7 @@ public class ClientHandler implements Runnable {
 
         }
         return HttpRequest.newBuilder()
-                .method(Enum.valueOf(Method.class, method))
+                .method(Enum.valueOf(Http.Method.class, method))
                 .mapping(mapping)
                 .build();
 

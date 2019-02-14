@@ -5,20 +5,20 @@ import java.util.TreeMap;
 
 public class HttpRequest {
 
-    private final Method method;
+    private final Http.Method method;
     private final String mapping;
     private final Map<String, String> headers;
     private final Map<String, String> parameters;
 
 
-    private HttpRequest(Method method, String mapping, Map<String, String> headers, Map<String, String> parameters) {
+    private HttpRequest(Http.Method method, String mapping, Map<String, String> headers, Map<String, String> parameters) {
         this.method = method;
         this.mapping = mapping;
         this.headers = new TreeMap<>(headers);
         this.parameters = new TreeMap<>(parameters);
     }
 
-    public Method getMethod() {
+    public Http.Method getMethod() {
         return method;
     }
 
@@ -50,7 +50,7 @@ public class HttpRequest {
 
     public static class Builder {
 
-        private Method method = Method.GET;
+        private Http.Method method = Http.Method.GET;
         private String mapping = "/";
         private Map<String, String> headers = new TreeMap<>();
         private Map<String, String> parameters = new TreeMap<>();
@@ -58,7 +58,7 @@ public class HttpRequest {
         private Builder() {
         }
 
-        public Builder method(Method method) {
+        public Builder method(Http.Method method) {
             this.method = method;
             return this;
         }
