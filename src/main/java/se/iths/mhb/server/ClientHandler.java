@@ -95,6 +95,7 @@ public class ClientHandler implements Runnable {
         System.out.println("**************************************");
         System.out.println(parameterList);
         System.out.println("**************************************");
+//        System.out.println(Integer.parseInt(ClientHandler.parameterList.get(0).getValue())+4+"\n");
 
         return HttpRequest.newBuilder()
                 .method(Enum.valueOf(Http.Method.class, method))

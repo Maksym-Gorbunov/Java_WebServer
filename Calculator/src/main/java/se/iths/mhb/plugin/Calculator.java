@@ -10,6 +10,8 @@ import java.util.Date;
 
 public class Calculator implements HttpService {
 
+
+
     @Override
     public String defaultMapping() {
         return "/calculator";
@@ -17,6 +19,10 @@ public class Calculator implements HttpService {
 
     @Override
     public HttpResponse serve(HttpRequest httpRequest) throws IOException {
+
+
+
+
         String dynamicDateHtmlPage = "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
@@ -24,10 +30,9 @@ public class Calculator implements HttpService {
                 "    <title>Title</title>\n" +
                 "</head>\n" +
                 "<body>\n" +
-
-                "CALCULATOR: \n"+
-
-
+                "CALCULATORR: \n"+
+//                a+
+                "???"+
 
                 "</body>\n" +
                 "</html>";
