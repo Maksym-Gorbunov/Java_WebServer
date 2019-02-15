@@ -25,6 +25,13 @@ public class PluginHandler implements Runnable {
     }
 
     private void load() {
+        //        Optional<Greetings> page = loader
+//                .stream()
+//                .filter(p -> p.type().isAnnotationPresent(Adress.class)
+//                      &&  p.type().getAnnotation(Adress.class).value().equals("/v1/Greeting"))
+//                .map(ServiceLoader.Provider::get).findFirst();
+//      .getClass().getAnnotation(Adress.class).value()
+
         URLClassLoader ucl = createClassLoader();
         ServiceLoader<HttpService> loader = ServiceLoader.load(HttpService.class, ucl);
         loader.forEach(server::setDefaultMapping);

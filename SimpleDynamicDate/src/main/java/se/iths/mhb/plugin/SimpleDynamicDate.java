@@ -1,12 +1,11 @@
 package se.iths.mhb.plugin;
 
-import se.iths.mhb.http.HttpRequest;
-import se.iths.mhb.http.HttpResponse;
-import se.iths.mhb.http.HttpService;
+import se.iths.mhb.http.*;
 
 import java.io.IOException;
 import java.util.Date;
 
+@Adress("/date")
 public class SimpleDynamicDate implements HttpService {
 
     @Override
@@ -43,4 +42,20 @@ public class SimpleDynamicDate implements HttpService {
     public String toString() {
         return "SimpleDynamicDate{}";
     }
+
+    @RequestMethod
+    public void getMetdo() {
+        System.out.println("invoked default GET");
+    }
+
+    @RequestMethod("HEAD")
+    public void headmetod() {
+        System.out.println("invoked HEAD");
+    }
+
+    @RequestMethod("POST")
+    public void postmetod() {
+        System.out.println("invoked POST");
+    }
+
 }

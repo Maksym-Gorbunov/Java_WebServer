@@ -3,6 +3,7 @@ package se.iths.mhb.server;
 import se.iths.mhb.http.*;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.*;
 
@@ -27,8 +28,22 @@ public class ClientHandler implements Runnable {
             System.out.println(httpRequest.toString());
             HttpResponse httpResponse = null;
             try {
-                //if (httpRequest.getMethod() == Method.GET) {
+
                 HttpService httpService = serviceMap.get(httpRequest.getMapping());
+
+                System.out.println(httpService.getClass().getDeclaredMethods().length);
+                Arrays.stream(httpService.getClass().getDeclaredMethods())
+                        .filter(m -> m.isAnnotationPresent(RequestMethod.class)
+                                && m.getAnnotation(RequestMethod.class).value().equals(httpRequest.getMethod().toString()))
+                        .findFirst().ifPresent(m -> {
+                    try {
+                        m.invoke(httpService);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                });
                 httpResponse = (httpService == null) ? errorResponse(404, httpRequest) : httpService.serve(httpRequest);
                 //} else {
                 //    httpResponse = errorResponse(501, httpRequest);
