@@ -76,8 +76,6 @@ public class ClientHandler implements Runnable {
 
         String input = headers.getFirst();
 
-        //todo Ändra så att alla raderna läses in och parsas
-        //todo headers osv
 
         StringTokenizer parse = new StringTokenizer(input);
         String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
