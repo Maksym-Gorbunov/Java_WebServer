@@ -103,10 +103,12 @@ public class ClientHandler implements Runnable {
         URL url = new URL("http://localhost/"+address);
         List<Parameter> params = new LinkedList<>();
         String query = url.getQuery();
-        String[] pairs = query.split("&");
-        for (String pair : pairs) {
-            int idx = pair.indexOf("=");
-            params.add(new Parameter(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8")));
+        if(query != null) {
+            String[] pairs = query.split("&");
+            for (String pair : pairs) {
+                int idx = pair.indexOf("=");
+                params.add(new Parameter(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8")));
+            }
         }
         return params;
     }
