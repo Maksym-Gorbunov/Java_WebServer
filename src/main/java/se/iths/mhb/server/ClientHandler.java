@@ -14,6 +14,7 @@ public class ClientHandler implements Runnable {
 
     private final Socket connect;
     private final Map<String, HttpService> serviceMap;
+    public static List<Parameter> parameterList = new LinkedList<>();
 
     public ClientHandler(Socket connect, Map<String, HttpService> serviceMap) {
         this.connect = connect;
@@ -85,8 +86,12 @@ public class ClientHandler implements Runnable {
         StringTokenizer addressTokeniser = new StringTokenizer(address, "?");
         String mapping = addressTokeniser.nextToken();
 
-        List<Parameter> parameterList = new LinkedList<>();
-        parameterList = splitQuery(address);
+//        List<Parameter> parameterList = new LinkedList<>();
+        System.out.println("AAAAAAAAAAAAAAAAAA"+address);
+        if(splitQuery(address).size()!=0){
+            parameterList = splitQuery(address);
+
+        }
         System.out.println("**************************************");
         System.out.println(parameterList);
         System.out.println("**************************************");
