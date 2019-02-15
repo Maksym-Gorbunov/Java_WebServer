@@ -7,6 +7,7 @@ import se.iths.mhb.http.HttpService;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -33,7 +34,6 @@ public class ClientHandler implements Runnable {
             try {
                 //if (httpRequest.getMethod() == Method.GET) {
                 HttpService httpService = serviceMap.get(httpRequest.getMapping());
-
                 httpResponse = (httpService == null) ? errorResponse(404, httpRequest) : httpService.serve(httpRequest);
                 //} else {
                 //    httpResponse = errorResponse(501, httpRequest);
@@ -66,8 +66,21 @@ public class ClientHandler implements Runnable {
     }
 
     private HttpRequest parseInput(BufferedReader in) throws IOException {
+        LinkedList<String> headers = new LinkedList<>();
+        String headerLine = null;
+        while ((headerLine = in.readLine()).length() != 0) {
+            headers.addLast(headerLine);
+            //System.out.println(headerLine);
+        }
 
-        String input = in.readLine();
+        StringBuilder payload = new StringBuilder();
+        while (in.ready()) {
+            payload.append((char) in.read());
+        }
+        //System.out.println("Payload data is: "+payload.toString());
+
+        String input = headers.getFirst();
+
         //todo Ändra så att alla raderna läses in och parsas
         //todo headers osv
 
