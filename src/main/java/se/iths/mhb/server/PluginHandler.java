@@ -28,7 +28,6 @@ public class PluginHandler implements Runnable {
         URLClassLoader ucl = createClassLoader();
         ServiceLoader<HttpService> loader = ServiceLoader.load(HttpService.class, ucl);
         loader.forEach(server::setDefaultMapping);
-
     }
 
     private URLClassLoader createClassLoader() {

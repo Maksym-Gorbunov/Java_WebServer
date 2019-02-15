@@ -1,15 +1,10 @@
 package se.iths.mhb.server;
 
-import se.iths.mhb.http.Http;
-import se.iths.mhb.http.HttpRequest;
-import se.iths.mhb.http.HttpResponse;
-import se.iths.mhb.http.HttpService;
+import se.iths.mhb.http.*;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import static se.iths.mhb.server.StaticFileService.errorResponse;
 
@@ -91,13 +86,23 @@ public class ClientHandler implements Runnable {
         StringTokenizer addressTokeniser = new StringTokenizer(address, "?");
         String mapping = addressTokeniser.nextToken();
 
+        List<Parameter> parameterList = new LinkedList<>();
         if (addressTokeniser.hasMoreTokens()) {
             String parameters = addressTokeniser.nextToken();
+            System.out.println(parameters);
+            String[] split = parameters.split("&");
+            Arrays.stream(split).forEach(s -> {
+                if (s.contains("=")) {
+                    String[] split1 = s.split("=");
+                    parameterList.add(new Parameter(split1[0], split1[1]));
+                }
+            });
 
         }
         return HttpRequest.newBuilder()
                 .method(Enum.valueOf(Http.Method.class, method))
                 .mapping(mapping)
+                .parameters(parameterList)
                 .build();
 
     }

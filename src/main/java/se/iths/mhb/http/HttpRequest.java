@@ -1,5 +1,7 @@
 package se.iths.mhb.http;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -8,14 +10,14 @@ public class HttpRequest {
     private final Http.Method method;
     private final String mapping;
     private final Map<String, String> headers;
-    private final Map<String, String> parameters;
+    private final List<Parameter> parameters;
 
 
-    private HttpRequest(Http.Method method, String mapping, Map<String, String> headers, Map<String, String> parameters) {
+    private HttpRequest(Http.Method method, String mapping, Map<String, String> headers, List<Parameter> parameters) {
         this.method = method;
         this.mapping = mapping;
         this.headers = new TreeMap<>(headers);
-        this.parameters = new TreeMap<>(parameters);
+        this.parameters = new LinkedList<>(parameters);
     }
 
     public Http.Method getMethod() {
@@ -30,7 +32,7 @@ public class HttpRequest {
         return headers;
     }
 
-    public Map<String, String> getParameters() {
+    public List<Parameter> getParameters() {
         return parameters;
     }
 
@@ -53,7 +55,7 @@ public class HttpRequest {
         private Http.Method method = Http.Method.GET;
         private String mapping = "/";
         private Map<String, String> headers = new TreeMap<>();
-        private Map<String, String> parameters = new TreeMap<>();
+        private List<Parameter> parameters = new LinkedList<>();
 
         private Builder() {
         }
@@ -73,9 +75,8 @@ public class HttpRequest {
             return this;
         }
 
-        public Builder parameters(String parameters) {
-            //todo
-            //todo parse parameters into Map paramters
+        public Builder parameters(List<Parameter> parameters) {
+            this.parameters.addAll(parameters);
             return this;
         }
 
