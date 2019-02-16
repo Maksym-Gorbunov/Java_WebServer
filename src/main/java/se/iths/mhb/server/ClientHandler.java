@@ -6,9 +6,14 @@ import se.iths.mhb.http.HttpResponse;
 import se.iths.mhb.http.Parameter;
 
 import java.io.*;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.function.Function;
 
 import static se.iths.mhb.server.StaticFileService.errorResponse;
@@ -18,6 +23,7 @@ public class ClientHandler implements Runnable {
 
     private final Socket connect;
     private final Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> serviceMap;
+    public static List<Parameter> parameterList = new LinkedList<>();
 
     public ClientHandler(Socket connect, Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> serviceMap) {
         this.connect = connect;

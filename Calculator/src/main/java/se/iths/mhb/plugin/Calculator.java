@@ -1,21 +1,13 @@
 package se.iths.mhb.plugin;
 
-import se.iths.mhb.http.HttpRequest;
-import se.iths.mhb.http.HttpResponse;
-import se.iths.mhb.http.HttpService;
-import se.iths.mhb.server.ClientHandler;
+import se.iths.mhb.http.*;
 
 import java.io.IOException;
-import java.util.Date;
 
+@Address("/calculator")
 public class Calculator implements HttpService {
 
-    @Override
-    public String defaultMapping() {
-        return "/calculator";
-    }
-
-    @Override
+    @RequestMethod
     public HttpResponse serve(HttpRequest httpRequest) throws IOException {
         String dynamicDateHtmlPage = "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
@@ -25,8 +17,7 @@ public class Calculator implements HttpService {
                 "</head>\n" +
                 "<body>\n" +
 
-                "CALCULATOR: \n"+
-
+                "CALCULATOR: \n" +
 
 
                 "</body>\n" +
@@ -36,7 +27,7 @@ public class Calculator implements HttpService {
         return HttpResponse.newBuilder()
                 .statusCode(200)
                 .setHeader("Content-type", "text/html")
-                .mapping(defaultMapping())
+                .mapping(httpRequest.getMapping())
                 .body(dynamicDateHtmlPage.getBytes())
                 .build();
 
