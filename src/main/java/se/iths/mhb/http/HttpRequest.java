@@ -1,5 +1,7 @@
 package se.iths.mhb.http;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +14,37 @@ public class HttpRequest {
     private final Map<String, String> headers;
     private final List<Parameter> parameters;
 
+    private void test(){
+        System.out.println("---->"+mapping);
+
+    }
+
+    String addQueryStringToUrlString(String url, final Map<Object, Object> parameters) throws UnsupportedEncodingException {
+        if (parameters == null) {
+            return url;
+        }
+
+        for (Map.Entry<Object, Object> parameter : parameters.entrySet()) {
+
+            final String encodedKey = URLEncoder.encode(parameter.getKey().toString(), "UTF-8");
+            final String encodedValue = URLEncoder.encode(parameter.getValue().toString(), "UTF-8");
+
+            if (!url.contains("?")) {
+                url += "?" + encodedKey + "=" + encodedValue;
+            } else {
+                url += "&" + encodedKey + "=" + encodedValue;
+            }
+        }
+
+        return url;
+    }
 
     private HttpRequest(Http.Method method, String mapping, Map<String, String> headers, List<Parameter> parameters) {
         this.method = method;
         this.mapping = mapping;
         this.headers = new TreeMap<>(headers);
         this.parameters = new LinkedList<>(parameters);
+        test();
     }
 
     public Http.Method getMethod() {
