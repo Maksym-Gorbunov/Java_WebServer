@@ -1,6 +1,8 @@
 package se.iths.mhb.server;
 
-import se.iths.mhb.http.HttpService;
+import se.iths.mhb.http.Http;
+import se.iths.mhb.http.HttpRequest;
+import se.iths.mhb.http.HttpResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +10,9 @@ import java.net.ServerSocket;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 
 public class Server {
@@ -45,18 +49,20 @@ public class Server {
 
     }
 
-    public synchronized void setMappings(List<String> mappingList, HttpService httpService) {
-        HashMap<String, HttpService> hashMap = new HashMap<>();
-        mappingList.forEach(mapping -> hashMap.put(mapping, httpService));
+    public synchronized void setMappings(List<String> mappingList, Function<HttpRequest, HttpResponse> responseFunction) {
+        HashMap<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> hashMap = new HashMap<>();
+        mappingList.forEach(string -> {
+            HashMap<Http.Method, Function<HttpRequest, HttpResponse>> methodMap = new HashMap();
+            methodMap.put(Http.Method.GET, responseFunction);
+            methodMap.put(Http.Method.HEAD, responseFunction);
+            hashMap.put(string, methodMap);
+        });
+
         mappings = mappings.addServices(hashMap);
     }
 
-    public synchronized void setMapping(String mapping, HttpService httpService) {
-        mappings = mappings.addService(mapping, httpService);
-    }
-
-    public synchronized void setDefaultMapping(HttpService httpService) {
-        mappings = mappings.addService(httpService.defaultMapping(), httpService);
+    public synchronized void setMapping(String mapping, Http.Method method, Function<HttpRequest, HttpResponse> responseFunction) {
+        mappings = mappings.addService(mapping, method, responseFunction);
     }
 
     private void startPluginListener() {
