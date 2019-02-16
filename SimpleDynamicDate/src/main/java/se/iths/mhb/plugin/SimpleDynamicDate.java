@@ -18,11 +18,6 @@ public class SimpleDynamicDate implements HttpService {
                 "<body>\n" +
                 "Date: " + new Date().toString() +
                 "\n" +
-                "<form method=\"post\">\n" +
-                "    First Name: <input type=\"text\" name=\"FirstName\" value=\"Mickey\"><br>\n" +
-                "    Last name: <input type=\"text\" name=\"LastName\" value=\"Mouse\"><br>\n" +
-                "    <input type=\"submit\" value=\"Submit\">\n" +
-                "</form>\n" +
                 "</body>\n" +
                 "</html>";
 
@@ -37,11 +32,6 @@ public class SimpleDynamicDate implements HttpService {
 
     }
 
-    @RequestMethod(Http.Method.POST)
-    public HttpResponse postMethod(HttpRequest httpRequest) {
-        System.out.println("RUNNING POST METHOD");
-        return getMethod(httpRequest);
-    }
 
     @Override
     public String toString() {

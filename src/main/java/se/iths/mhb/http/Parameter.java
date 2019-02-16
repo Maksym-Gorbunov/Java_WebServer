@@ -14,6 +14,15 @@ public class Parameter {
         this.value = value;
     }
 
+    public Parameter(String pair) {
+        Objects.requireNonNull(pair);
+        if (!pair.contains("="))
+            throw new IllegalArgumentException("Not valid pair, must contain =");
+        int idx = pair.indexOf("=");
+        this.key = pair.substring(0, idx);
+        this.value = pair.substring(idx + 1);
+    }
+
     public String getKey() {
         return key;
     }
