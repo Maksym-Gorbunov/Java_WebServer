@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME) // Make this annotation accessible at runtime via reflection.
 @Target({ElementType.METHOD})
 public @interface RequestMethod {
-    String value() default "GET";
+    Http.Method value() default Http.Method.GET;
 }

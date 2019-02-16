@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME) // Make this annotation accessible at runtime via reflection.
 @Target({ElementType.TYPE})       // This annotation can only be applied to class methods.
-public @interface Adress {
+public @interface Address {
     String value() default "/default";
 }

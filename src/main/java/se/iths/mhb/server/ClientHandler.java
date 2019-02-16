@@ -1,11 +1,14 @@
 package se.iths.mhb.server;
 
-import se.iths.mhb.http.*;
+import se.iths.mhb.http.Http;
+import se.iths.mhb.http.HttpRequest;
+import se.iths.mhb.http.HttpResponse;
+import se.iths.mhb.http.Parameter;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.*;
+import java.util.function.Function;
 
 import static se.iths.mhb.server.StaticFileService.errorResponse;
 
@@ -13,9 +16,9 @@ public class ClientHandler implements Runnable {
 
 
     private final Socket connect;
-    private final Map<String, HttpService> serviceMap;
+    private final Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> serviceMap;
 
-    public ClientHandler(Socket connect, Map<String, HttpService> serviceMap) {
+    public ClientHandler(Socket connect, Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> serviceMap) {
         this.connect = connect;
         this.serviceMap = serviceMap;
     }
@@ -26,32 +29,7 @@ public class ClientHandler implements Runnable {
         try (var in = new BufferedReader(new InputStreamReader(connect.getInputStream()))) {
             HttpRequest httpRequest = parseInput(in);
             System.out.println(httpRequest.toString());
-            HttpResponse httpResponse = null;
-            try {
-
-                HttpService httpService = serviceMap.get(httpRequest.getMapping());
-
-                System.out.println(httpService.getClass().getDeclaredMethods().length);
-                Arrays.stream(httpService.getClass().getDeclaredMethods())
-                        .filter(m -> m.isAnnotationPresent(RequestMethod.class)
-                                && m.getAnnotation(RequestMethod.class).value().equals(httpRequest.getMethod().toString()))
-                        .findFirst().ifPresent(m -> {
-                    try {
-                        m.invoke(httpService);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                });
-                httpResponse = (httpService == null) ? errorResponse(404, httpRequest) : httpService.serve(httpRequest);
-                //} else {
-                //    httpResponse = errorResponse(501, httpRequest);
-                //}
-            } catch (FileNotFoundException e) {
-                System.out.println("Error with file not found");
-                httpResponse = errorResponse(404, httpRequest);
-            }
+            HttpResponse httpResponse = doRequest(httpRequest);
 
             try (var out = new PrintWriter(connect.getOutputStream()); var dataOut = new BufferedOutputStream(connect.getOutputStream());) {
                 System.out.println(httpResponse.toString());
@@ -102,7 +80,7 @@ public class ClientHandler implements Runnable {
         List<Parameter> parameterList = new LinkedList<>();
         if (addressTokeniser.hasMoreTokens()) {
             String parameters = addressTokeniser.nextToken();
-            System.out.println(parameters);
+            // System.out.println(parameters);
             String[] split = parameters.split("&");
             Arrays.stream(split).forEach(s -> {
                 if (s.contains("=")) {
@@ -120,6 +98,19 @@ public class ClientHandler implements Runnable {
 
     }
 
+    private HttpResponse doRequest(HttpRequest httpRequest) {
+        var methods = serviceMap.get(httpRequest.getMapping());
+        if (methods == null)
+            return errorResponse(404, httpRequest);
+
+        var function = methods.get(httpRequest.getMethod());
+        if (function == null)
+            return errorResponse(501, httpRequest);
+
+        return function.apply(httpRequest);
+
+    }
+
     private void send(PrintWriter out, BufferedOutputStream dataOut, HttpResponse httpResponse) throws IOException {
         out.println(httpResponse.getStatusLine());
 
@@ -130,6 +121,5 @@ public class ClientHandler implements Runnable {
         dataOut.write(httpResponse.getBody(), 0, httpResponse.getBody().length);
         dataOut.flush();
     }
-
 
 }

@@ -1,15 +1,21 @@
 package se.iths.mhb.server;
 
-import se.iths.mhb.http.HttpService;
+import se.iths.mhb.http.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
@@ -25,16 +31,33 @@ public class PluginHandler implements Runnable {
     }
 
     private void load() {
-        //        Optional<Greetings> page = loader
-//                .stream()
-//                .filter(p -> p.type().isAnnotationPresent(Adress.class)
-//                      &&  p.type().getAnnotation(Adress.class).value().equals("/v1/Greeting"))
-//                .map(ServiceLoader.Provider::get).findFirst();
-//      .getClass().getAnnotation(Adress.class).value()
-
         URLClassLoader ucl = createClassLoader();
         ServiceLoader<HttpService> loader = ServiceLoader.load(HttpService.class, ucl);
-        loader.forEach(server::setDefaultMapping);
+        for (HttpService httpService : loader) {
+            if (httpService.getClass().isAnnotationPresent(Address.class)) {
+                String mapping = httpService.getClass().getAnnotation(Address.class).value();
+                List<Method> collect = Arrays.stream(httpService.getClass().getDeclaredMethods())
+                        .filter(m -> m.isAnnotationPresent(RequestMethod.class))
+                        .collect(Collectors.toList());
+
+                collect.forEach(method -> {
+                    Http.Method requestMethod = method.getAnnotation(RequestMethod.class).value();
+                    Function<HttpRequest, HttpResponse> responseFunction = httpRequest -> {
+                        try {
+                            return (HttpResponse) method.invoke(httpService, httpRequest);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    };
+                    server.setMapping(mapping, requestMethod, responseFunction);
+                });
+
+            }
+        }
+
     }
 
     private URLClassLoader createClassLoader() {
