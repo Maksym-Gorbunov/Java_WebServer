@@ -86,8 +86,6 @@ public class ClientHandler implements Runnable {
         StringTokenizer addressTokeniser = new StringTokenizer(address, "?");
         String mapping = addressTokeniser.nextToken();
 
-//        List<Parameter> parameterList = new LinkedList<>();
-        System.out.println("AAAAAAAAAAAAAAAAAA"+address);
         if(splitQuery(address).size()!=0){
             parameterList = splitQuery(address);
 
@@ -95,7 +93,6 @@ public class ClientHandler implements Runnable {
         System.out.println("**************************************");
         System.out.println(parameterList);
         System.out.println("**************************************");
-//        System.out.println(Integer.parseInt(ClientHandler.parameterList.get(0).getValue())+4+"\n");
 
         return HttpRequest.newBuilder()
                 .method(Enum.valueOf(Http.Method.class, method))
