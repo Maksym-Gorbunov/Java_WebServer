@@ -6,8 +6,14 @@ import se.iths.mhb.http.HttpResponse;
 import se.iths.mhb.http.Parameter;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.Socket;
-import java.util.*;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.function.Function;
 
 import static se.iths.mhb.server.StaticFileService.errorResponse;
@@ -17,6 +23,7 @@ public class ClientHandler implements Runnable {
 
     private final Socket connect;
     private final Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> serviceMap;
+    public static List<Parameter> parameterList = new LinkedList<>();
 
     public ClientHandler(Socket connect, Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> serviceMap) {
         this.connect = connect;
@@ -77,27 +84,62 @@ public class ClientHandler implements Runnable {
         StringTokenizer addressTokeniser = new StringTokenizer(address, "?");
         String mapping = addressTokeniser.nextToken();
 
-        List<Parameter> parameterList = new LinkedList<>();
-        if (addressTokeniser.hasMoreTokens()) {
-            String parameters = addressTokeniser.nextToken();
-            // System.out.println(parameters);
-            String[] split = parameters.split("&");
-            Arrays.stream(split).forEach(s -> {
-                if (s.contains("=")) {
-                    String[] split1 = s.split("=");
-                    parameterList.add(new Parameter(split1[0], split1[1]));
-                }
-            });
+//        List<Parameter> parameterList = new LinkedList<>();
+        System.out.println("AAAAAAAAAAAAAAAAAA"+address);
+        if(splitQuery(address).size()!=0){
+            parameterList = splitQuery(address);
 
         }
+        System.out.println("**************************************");
+        System.out.println(parameterList);
+        System.out.println("**************************************");
+
         return HttpRequest.newBuilder()
                 .method(Enum.valueOf(Http.Method.class, method))
                 .mapping(mapping)
                 .parameters(parameterList)
                 .build();
-
     }
 
+    // Create parameters
+    public static List<Parameter> splitQuery(String address) throws UnsupportedEncodingException, MalformedURLException {
+        URL url = new URL("http://localhost/"+address);
+        List<Parameter> params = new LinkedList<>();
+        String query = url.getQuery();
+        if(query != null) {
+            String[] pairs = query.split("&");
+            for (String pair : pairs) {
+                int idx = pair.indexOf("=");
+                params.add(new Parameter(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8")));
+            }
+        }
+        return params;
+    }
+
+    /*
+    private String addQueryStringToUrlString(String url, List<Parameter> parameters) throws UnsupportedEncodingException {
+        System.out.println("************************"+url);
+        if (parameters == null) {
+            return url;
+        }
+        for (Parameter parameter : parameters) {
+            final String encodedKey = URLEncoder.encode(parameter.getKey().toString(), "UTF-8");
+            final String encodedValue = URLEncoder.encode(parameter.getValue().toString(), "UTF-8");
+            if (!url.contains("?")) {
+                url += "?" + encodedKey + "=" + encodedValue;
+            } else {
+                url += "&" + encodedKey + "=" + encodedValue;
+            }
+            parameters.add(new Parameter(encodedKey, encodedValue));
+            System.out.println("****************************");
+            System.out.println(encodedKey+": "+encodedValue);
+            System.out.println("****************************");
+
+        }
+
+        return url;
+    }
+*/
     private HttpResponse doRequest(HttpRequest httpRequest) {
         var methods = serviceMap.get(httpRequest.getMapping());
         if (methods == null)
