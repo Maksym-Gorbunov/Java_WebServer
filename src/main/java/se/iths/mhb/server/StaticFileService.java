@@ -24,42 +24,42 @@ public class StaticFileService implements HttpService, Runnable {
         this.server = server;
     }
 
-    @Override
-    public String defaultMapping() {
-        return "/";
-    }
-
-    @Override
-    public HttpResponse serve(HttpRequest httpRequest) throws IOException {
+    public HttpResponse serve(HttpRequest httpRequest) {
         String fileRequested = httpRequest.getMapping();
         if (httpRequest.getMapping().endsWith("/")) {
             fileRequested += DEFAULT_FILE;
         } else {
             fileRequested = fileRequested.replaceFirst("/", "");
         }
-        System.out.println(fileRequested);
+        // System.out.println(fileRequested);
         return response(200, fileRequested, httpRequest);
 
     }
 
 
-    public static HttpResponse response(int code, String fileRequested, HttpRequest httpRequest) throws IOException {
+    public static HttpResponse response(int code, String fileRequested, HttpRequest httpRequest) {
         File file = new File(Server.WEB_ROOT, fileRequested);
         int fileLength = (int) file.length();
         String content = Http.getContentType(fileRequested.substring(fileRequested.lastIndexOf(".")));
-        byte[] body = readFileData(file, fileLength);
 
-        return HttpResponse.newBuilder()
-                .statusCode(code)
-                .setHeader("Content-type", content)
-                .setHeader("Content-length", "" + fileLength)
-                .mapping(httpRequest.getMapping())
-                .body(body)
-                .build();
+        try {
+            byte[] body = readFileData(file, fileLength);
+            return HttpResponse.newBuilder()
+                    .statusCode(code)
+                    .setHeader("Content-type", content)
+                    .setHeader("Content-length", "" + fileLength)
+                    .mapping(httpRequest.getMapping())
+                    .body(body)
+                    .build();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return errorResponse(404, httpRequest);
+        }
+
 
     }
 
-    public static HttpResponse errorResponse(int code, HttpRequest httpRequest) throws IOException {
+    public static HttpResponse errorResponse(int code, HttpRequest httpRequest) {
         String fileRequested = "";
         switch (code) {
             case 404:
@@ -67,6 +67,9 @@ public class StaticFileService implements HttpService, Runnable {
                 break;
             case 501:
                 fileRequested = METHOD_NOT_SUPPORTED;
+                break;
+            case 500:
+                fileRequested = "500.html";
                 break;
         }
         return response(code, fileRequested, httpRequest);
@@ -81,20 +84,17 @@ public class StaticFileService implements HttpService, Runnable {
         return fileData;
     }
 
-//    public static String readFile(File file) throws IOException {
-//        return Files.readString(file.toPath());
-//    }
-
     private void loadAllStaticFiles() {
         File[] files = Server.WEB_ROOT.listFiles(File::isFile);
         List<String> strings = Arrays.stream(files).map(file -> "/" + file.getName().toLowerCase()).collect(Collectors.toList());
-        server.setMappings(strings, this);
+        server.setMappings(strings, this::serve);
     }
 
     @Override
     public void run() {
         System.out.println("Init Static files");
-        server.setMapping("/", this);
+        server.setMapping("/", Http.Method.GET, this::serve);
+        server.setMapping("/", Http.Method.HEAD, this::serve);
         loadAllStaticFiles();
 
         try {
