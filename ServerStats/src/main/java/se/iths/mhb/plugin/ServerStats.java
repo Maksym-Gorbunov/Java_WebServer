@@ -4,6 +4,7 @@ import se.iths.mhb.http.*;
 
 import java.util.HashMap;
 
+//todo Make thread safe
 @Address("/serverstats")
 public class ServerStats implements HttpService {
 
