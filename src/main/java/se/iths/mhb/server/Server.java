@@ -7,11 +7,11 @@ import se.iths.mhb.http.HttpResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -25,10 +25,12 @@ public class Server {
 
     private final int port;
     private Mappings mappings;
+    private Reader reader;
 
     public Server(int port) {
         this.port = port;
         this.mappings = new Mappings();
+        this.reader = new Reader();
     }
 
     public void start() {
@@ -40,8 +42,7 @@ public class Server {
             System.out.println("Server started.\nListening for connections on port : " + port + " ...\n");
 
             while (true) {
-                System.out.println("Connection opened. (" + new Date() + ")");
-                CompletableFuture.runAsync(new ClientHandler(serverConnect.accept(), mappings.getServiceMap()));
+                CompletableFuture.runAsync(new ClientHandler(serverConnect.accept(), mappings.getServiceMap(), reader.getReadAllRequests()));
             }
         } catch (IOException e) {
             System.err.println("Server Connection error : " + e.getMessage());
@@ -63,6 +64,10 @@ public class Server {
 
     public synchronized void setMapping(String mapping, Http.Method method, Function<HttpRequest, HttpResponse> responseFunction) {
         mappings = mappings.addService(mapping, method, responseFunction);
+    }
+
+    public synchronized void setRequestReader(Consumer<HttpRequest> consumer) {
+        reader = reader.addConsumer(consumer);
     }
 
     private void startPluginListener() {

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class PluginHandler implements Runnable {
         URLClassLoader ucl = createClassLoader();
         ServiceLoader<HttpService> loader = ServiceLoader.load(HttpService.class, ucl);
         for (HttpService httpService : loader) {
+            //mapp address and requestmethods
             if (httpService.getClass().isAnnotationPresent(Address.class)) {
                 String mapping = httpService.getClass().getAnnotation(Address.class).value();
                 List<Method> collect = Arrays.stream(httpService.getClass().getDeclaredMethods())
@@ -54,7 +56,24 @@ public class PluginHandler implements Runnable {
                     };
                     server.setMapping(mapping, requestMethod, responseFunction);
                 });
+            }
 
+            //mapp readrequest methods
+            List<Method> methods = Arrays.stream(httpService.getClass().getDeclaredMethods())
+                    .filter(m -> m.isAnnotationPresent(ReadRequest.class))
+                    .collect(Collectors.toList());
+
+            for (var method : methods) {
+                Consumer<HttpRequest> requestConsumer = httpRequest -> {
+                    try {
+                        method.invoke(httpService, httpRequest);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                };
+                server.setRequestReader(requestConsumer);
             }
         }
 

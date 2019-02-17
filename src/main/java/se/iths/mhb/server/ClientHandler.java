@@ -7,10 +7,8 @@ import se.iths.mhb.http.Parameter;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static se.iths.mhb.server.StaticFileService.errorResponse;
@@ -20,18 +18,24 @@ public class ClientHandler implements Runnable {
 
     private final Socket connect;
     private final Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> serviceMap;
+    private final List<Consumer<HttpRequest>> requestConsumers;
 
-    public ClientHandler(Socket connect, Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> serviceMap) {
+    public ClientHandler(Socket connect, Map<String, Map<Http.Method,
+            Function<HttpRequest, HttpResponse>>> serviceMap,
+                         List<Consumer<HttpRequest>> requestConsumers) {
         this.connect = connect;
         this.serviceMap = serviceMap;
+        this.requestConsumers = requestConsumers;
     }
 
     @Override
     public void run() {
-
+        System.out.println("Connection opened. (" + new Date() + ")");
         try (var in = new BufferedReader(new InputStreamReader(connect.getInputStream()))) {
             HttpRequest httpRequest = parseInput(in);
             System.out.println(httpRequest.toString());
+
+
             HttpResponse httpResponse = doRequest(httpRequest);
 
             try (var out = new PrintWriter(connect.getOutputStream()); var dataOut = new BufferedOutputStream(connect.getOutputStream());) {
@@ -139,6 +143,9 @@ public class ClientHandler implements Runnable {
     }
 */
     private HttpResponse doRequest(HttpRequest httpRequest) {
+
+        requestConsumers.forEach(consumer -> consumer.accept(httpRequest));
+
         var methods = serviceMap.get(httpRequest.getMapping());
         if (methods == null)
             return errorResponse(404, httpRequest);
