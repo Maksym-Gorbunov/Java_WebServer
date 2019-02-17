@@ -13,20 +13,36 @@ public class ServerStats implements HttpService {
 
     @RequestMethod
     public HttpResponse getStatsHtmlPage(HttpRequest httpRequest) {
-        StringBuilder stats = new StringBuilder("<ul>");
-        pageHits.forEach((s, integer) -> stats.append("<li>" + s + " " + integer + "</li>\n"));
-        stats.append("</ul>\n");
+        StringBuilder stats = new StringBuilder();
+        pageHits.forEach((s, integer) -> stats.append("<tr>\n<td>" + s + "</td>\n<td>" + integer + "</td>\n</tr>\n"));
+
 
         String page = "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
                 "    <meta charset=\"UTF-8\">\n" +
+                "    <link rel=\"stylesheet\" href=\"/w3.css\">" +
                 "    <title>Server Stats</title>\n" +
                 "</head>\n" +
                 "<body>\n" +
                 "<H3>Server Stats</H3>\n" +
                 "\n" +
+
+                "<table class=\"w3-table w3-border w3-striped w3-hoverable\">\n" +
+                "<thead class=\"w3-flat-green-sea\">\n" +
+                "<tr>\n" +
+                "<th>Page</th>\n" +
+                "<th>Hits</th>\n" +
+                "</tr>\n" +
+                "</thead>\n" +
+                "<tbody>\n" +
+
                 stats.toString() +
+
+                "</tbody>\n" +
+                "</table>\n" +
+
+
                 "</body>\n" +
                 "</html>";
 
