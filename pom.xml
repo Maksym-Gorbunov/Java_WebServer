@@ -12,6 +12,7 @@
         <module>SimpleDynamicDate</module>
         <module>Calculator</module>
         <module>SimplePostForm</module>
+        <module>ServerStats</module>
     </modules>
 
     <properties>
