@@ -1,5 +1,10 @@
 package se.iths.mhb.http;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 public final class Http {
 
     public enum Method {GET, HEAD, POST, PUT, DELETE}
@@ -22,5 +27,14 @@ public final class Http {
             default:
                 return "text/plain";
         }
+    }
+
+    public static List<Parameter> parseParameters(String parameters) {
+        Objects.requireNonNull(parameters);
+        return Arrays.stream(parameters.split("&"))
+                .map(String::trim)
+                .filter(pair -> pair.contains("="))
+                .map(Parameter::new)
+                .collect(Collectors.toList());
     }
 }
