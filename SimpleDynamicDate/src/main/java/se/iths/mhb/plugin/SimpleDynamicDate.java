@@ -13,7 +13,7 @@ public class SimpleDynamicDate implements HttpService {
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
                 "    <meta charset=\"UTF-8\">\n" +
-                "    <title>Title</title>\n" +
+                "    <title>Date</title>\n" +
                 "</head>\n" +
                 "<body>\n" +
                 "Date: " + new Date().toString() +
