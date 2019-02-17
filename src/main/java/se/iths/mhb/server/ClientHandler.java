@@ -35,8 +35,8 @@ public class ClientHandler implements Runnable {
             HttpRequest httpRequest = parseInput(in);
             System.out.println(httpRequest.toString());
 
-
-            HttpResponse httpResponse = doRequest(httpRequest);
+            consumeRequest(httpRequest);
+            HttpResponse httpResponse = handleRequest(httpRequest);
 
             try (var out = new PrintWriter(connect.getOutputStream()); var dataOut = new BufferedOutputStream(connect.getOutputStream());) {
                 System.out.println(httpResponse.toString());
@@ -142,10 +142,12 @@ public class ClientHandler implements Runnable {
         return url;
     }
 */
-    private HttpResponse doRequest(HttpRequest httpRequest) {
 
+    private void consumeRequest(HttpRequest httpRequest) {
         requestConsumers.forEach(consumer -> consumer.accept(httpRequest));
+    }
 
+    private HttpResponse handleRequest(HttpRequest httpRequest) {
         var methods = serviceMap.get(httpRequest.getMapping());
         if (methods == null)
             return errorResponse(404, httpRequest);
@@ -155,7 +157,6 @@ public class ClientHandler implements Runnable {
             return errorResponse(501, httpRequest);
 
         return function.apply(httpRequest);
-
     }
 
     private void send(PrintWriter out, BufferedOutputStream dataOut, HttpResponse httpResponse) throws IOException {

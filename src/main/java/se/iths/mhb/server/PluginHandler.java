@@ -38,27 +38,26 @@ public class PluginHandler implements Runnable {
             //mapp address and requestmethods
             if (httpService.getClass().isAnnotationPresent(Address.class)) {
                 String mapping = httpService.getClass().getAnnotation(Address.class).value();
-                List<Method> collect = Arrays.stream(httpService.getClass().getDeclaredMethods())
+                List<Method> methods = Arrays.stream(httpService.getClass().getDeclaredMethods())
                         .filter(m -> m.isAnnotationPresent(RequestMethod.class))
                         .collect(Collectors.toList());
 
-                collect.forEach(method -> {
+
+                for (var method : methods) {
                     Http.Method requestMethod = method.getAnnotation(RequestMethod.class).value();
                     Function<HttpRequest, HttpResponse> responseFunction = httpRequest -> {
                         try {
                             return (HttpResponse) method.invoke(httpService, httpRequest);
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
+                        } catch (IllegalAccessException | InvocationTargetException e) {
                             e.printStackTrace();
                         }
-                        return null;
+                        return StaticFileService.errorResponse(500, httpRequest);
                     };
                     server.setMapping(mapping, requestMethod, responseFunction);
-                });
+                }
             }
 
-            //mapp readrequest methods
+            //load readrequest consumers
             List<Method> methods = Arrays.stream(httpService.getClass().getDeclaredMethods())
                     .filter(m -> m.isAnnotationPresent(ReadRequest.class))
                     .collect(Collectors.toList());
@@ -67,13 +66,11 @@ public class PluginHandler implements Runnable {
                 Consumer<HttpRequest> requestConsumer = httpRequest -> {
                     try {
                         method.invoke(httpService, httpRequest);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
+                    } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
                 };
-                server.setRequestReader(requestConsumer);
+                server.addRequestConsumer(requestConsumer);
             }
         }
 

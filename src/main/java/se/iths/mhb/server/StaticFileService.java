@@ -68,6 +68,9 @@ public class StaticFileService implements HttpService, Runnable {
             case 501:
                 fileRequested = METHOD_NOT_SUPPORTED;
                 break;
+            case 500:
+                fileRequested = "500.html";
+                break;
         }
         return response(code, fileRequested, httpRequest);
     }

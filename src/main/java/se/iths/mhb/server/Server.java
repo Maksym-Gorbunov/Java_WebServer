@@ -25,12 +25,12 @@ public class Server {
 
     private final int port;
     private Mappings mappings;
-    private Reader reader;
+    private RequestConsumers requestConsumers;
 
     public Server(int port) {
         this.port = port;
         this.mappings = new Mappings();
-        this.reader = new Reader();
+        this.requestConsumers = new RequestConsumers();
     }
 
     public void start() {
@@ -42,7 +42,7 @@ public class Server {
             System.out.println("Server started.\nListening for connections on port : " + port + " ...\n");
 
             while (true) {
-                CompletableFuture.runAsync(new ClientHandler(serverConnect.accept(), mappings.getServiceMap(), reader.getReadAllRequests()));
+                CompletableFuture.runAsync(new ClientHandler(serverConnect.accept(), mappings.getServiceMap(), requestConsumers.getRequestConsumers()));
             }
         } catch (IOException e) {
             System.err.println("Server Connection error : " + e.getMessage());
@@ -66,8 +66,8 @@ public class Server {
         mappings = mappings.addService(mapping, method, responseFunction);
     }
 
-    public synchronized void setRequestReader(Consumer<HttpRequest> consumer) {
-        reader = reader.addConsumer(consumer);
+    public synchronized void addRequestConsumer(Consumer<HttpRequest> consumer) {
+        requestConsumers = requestConsumers.add(consumer);
     }
 
     private void startPluginListener() {
