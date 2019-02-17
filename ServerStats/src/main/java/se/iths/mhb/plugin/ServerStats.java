@@ -9,6 +9,8 @@ public class ServerStats implements HttpService {
 
     private final HashMap<String, Integer> pageHits = new HashMap<>();
 
+    //todo add api which returns json
+
     @RequestMethod
     public HttpResponse getStatsHtmlPage(HttpRequest httpRequest) {
         StringBuilder stats = new StringBuilder("<ul>");
@@ -37,6 +39,7 @@ public class ServerStats implements HttpService {
                 .build();
     }
 
+    //todo Add store to database or store to file
     @ReadRequest
     public void collectStats(HttpRequest httpRequest) {
         addPageHit(httpRequest.getMapping());
