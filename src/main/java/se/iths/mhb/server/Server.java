@@ -35,6 +35,9 @@ public class Server {
 
     public void start() {
         //todo read some config file for port and if specify plugin to specific mapping
+        RootPage rootPage = new RootPage(this);
+        setMapping("/", Http.Method.GET, rootPage::showAllMappingsPage);
+        setMapping("/", Http.Method.HEAD, rootPage::showAllMappingsPage);
         startStaticFileListener();
         startPluginListener();
         try {
@@ -48,6 +51,10 @@ public class Server {
             System.err.println("Server Connection error : " + e.getMessage());
         }
 
+    }
+
+    public Mappings getMappings() {
+        return mappings;
     }
 
     public synchronized void setMappings(List<String> mappingList, Function<HttpRequest, HttpResponse> responseFunction) {

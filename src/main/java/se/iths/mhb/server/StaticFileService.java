@@ -93,8 +93,8 @@ public class StaticFileService implements HttpService, Runnable {
     @Override
     public void run() {
         System.out.println("Init Static files");
-        server.setMapping("/", Http.Method.GET, this::serve);
-        server.setMapping("/", Http.Method.HEAD, this::serve);
+//        server.setMapping("/", Http.Method.GET, this::serve);
+//        server.setMapping("/", Http.Method.HEAD, this::serve);
         loadAllStaticFiles();
 
         try {
