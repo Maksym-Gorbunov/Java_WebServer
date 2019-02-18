@@ -22,7 +22,6 @@ public class HttpResponse {
         this.parameters = new TreeMap<>(parameters);
         this.body = body;
     }
-
     public Http.Method getMethod() {
         return method;
     }

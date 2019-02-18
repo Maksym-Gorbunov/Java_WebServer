@@ -14,16 +14,20 @@ public final class Http {
             case ".htm":
             case ".html":
                 return "text/html";
-            case ".css":
-                return "text/css";
-            case ".pdf":
-                return "application/pdf";
-            case ".js":
-                return "text/javascript";
-            case ".json":
-                return "application/json";
             case ".ico":
                 return "image/vnd.microsoft.icon";
+            case ".css":
+                return "text/css";
+            case ".js":
+                return "text/javascript";
+            case ".png":
+                return "image/png";
+            case ".jpg":
+                return "image/jpeg";
+            case ".pdf":
+                return "application/pdf";
+            case ".json":
+                return "application/json";
             default:
                 return "text/plain";
         }
