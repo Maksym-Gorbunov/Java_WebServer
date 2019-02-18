@@ -2,15 +2,16 @@ package se.iths.mhb.plugin;
 
 import se.iths.mhb.http.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @Address("/serverstats")
 public class ServerStats implements HttpService {
 
-    private final Map<String, Map<Http.Method, PageHit>> pageHits = new HashMap<>();
+    private final Storage runtimeStorage;
+    private final Storage sqlLiteStorage;
+
+    public ServerStats() {
+        this.runtimeStorage = new RuntimeStorage();
+        this.sqlLiteStorage = new SqlLiteStorage();
+    }
 
     //todo add api which returns json
 
@@ -19,9 +20,18 @@ public class ServerStats implements HttpService {
     @RequestMethod
     public HttpResponse getStatsHtmlPage(HttpRequest httpRequest) {
         StringBuilder stats = new StringBuilder();
-        getPageHits().stream()
+        runtimeStorage.getHits().stream()
                 .sorted()
                 .forEach((pageHit) -> stats.append(
+                        "       <tr class=\"item\">\n" +
+                                "<td><a href=\"" + pageHit.getAddress() + "\">" + pageHit.getAddress() + "</a></td>\n" +
+                                "<td>" + pageHit.getMethod() + "</td>\n" +
+                                "<td>" + pageHit.getCounter() + "</td>\n" +
+                                "</tr>\n"));
+
+        StringBuilder sqlStats = new StringBuilder();
+        sqlLiteStorage.getHits()
+                .forEach((pageHit) -> sqlStats.append(
                         "       <tr class=\"item\">\n" +
                                 "<td><a href=\"" + pageHit.getAddress() + "\">" + pageHit.getAddress() + "</a></td>\n" +
                                 "<td>" + pageHit.getMethod() + "</td>\n" +
@@ -59,6 +69,24 @@ public class ServerStats implements HttpService {
 
                 "</tbody>\n" +
                 "</table>\n" +
+                "\n" +
+
+                "<table class=\"w3-table w3-border w3-striped w3-hoverable\" id=\"statstablesql\">\n" +
+                "<thead class=\"w3-flat-green-sea\">\n" +
+                "<tr>\n" +
+                "<th onclick=\"w3.sortHTML('#statstablesql','.item', 'td:nth-child(1)')\" style=\"cursor:pointer\">Page</th>\n" +
+                "<th onclick=\"w3.sortHTML('#statstablesql','.item', 'td:nth-child(2)')\" style=\"cursor:pointer\">Method</th>\n" +
+                "<th onclick=\"w3.sortHTML('#statstablesql','.item', 'td:nth-child(3)')\" style=\"cursor:pointer\">Hits</th>\n" +
+                "</tr >\n" +
+                "</thead>\n" +
+                "<tbody>\n" +
+
+                sqlStats.toString() +
+
+                "</tbody>\n" +
+                "</table>\n" +
+
+
                 "</div>" +
 
                 "</body>\n" +
@@ -76,33 +104,9 @@ public class ServerStats implements HttpService {
     //todo Add store to database or store to file
     @ReadRequest
     public void collectStats(HttpRequest httpRequest) {
-        addPageHit(httpRequest);
+        runtimeStorage.addHit(httpRequest);
+        sqlLiteStorage.addHit(httpRequest);
     }
 
-    private synchronized List<PageHit> getPageHits() {
-        return pageHits.values()
-                .stream()
-                .flatMap(methodPageHitMap -> methodPageHitMap.values().stream())
-                .collect(Collectors.toList());
-    }
-
-    private synchronized void addPageHit(HttpRequest httpRequest) {
-        String address = httpRequest.getMapping();
-        Http.Method method = httpRequest.getMethod();
-        var map = pageHits.get(address);
-        if (map == null) {
-            HashMap<Http.Method, PageHit> methodPageHitHashMap = new HashMap<>();
-            methodPageHitHashMap.put(method, new PageHit(address, method, 1));
-            pageHits.put(address, methodPageHitHashMap);
-        } else {
-            var pageHit = map.get(method);
-            if (pageHit == null) {
-                map.put(method, new PageHit(address, method, 1));
-            } else {
-                map.put(method, pageHit.increment());
-            }
-        }
-
-    }
 
 }
