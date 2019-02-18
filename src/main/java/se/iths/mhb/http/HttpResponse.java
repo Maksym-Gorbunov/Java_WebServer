@@ -90,6 +90,9 @@ public class HttpResponse {
                 case 501:
                     this.statusLine += " 501 Not Implemented";
                     break;
+                case 500:
+                    this.statusLine += " 500 Internal Server Error";
+                    break;
             }
             return this;
         }
