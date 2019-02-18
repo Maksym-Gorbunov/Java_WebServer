@@ -3,7 +3,6 @@ package se.iths.mhb.server;
 import se.iths.mhb.http.Http;
 import se.iths.mhb.http.HttpRequest;
 import se.iths.mhb.http.HttpResponse;
-import se.iths.mhb.http.Parameter;
 
 import java.io.*;
 import java.net.Socket;
@@ -61,6 +60,8 @@ public class ClientHandler implements Runnable {
     }
 
     private HttpRequest parseInput(BufferedReader in) throws IOException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder();
+
         LinkedList<String> headers = new LinkedList<>();
         String headerLine = null;
         while ((headerLine = in.readLine()).length() != 0) {
@@ -72,35 +73,27 @@ public class ClientHandler implements Runnable {
         while (in.ready()) {
             payload.append((char) in.read());
         }
-        String content = null;
-        List<Parameter> contentParameters = null;
+
         if (payload.toString().length() > 0) {
-            content = payload.toString();
-            contentParameters = Http.parseParameters(content);
+            String content = payload.toString();
             System.out.println("[Payload] " + content);
+            builder = builder.content(content);
+            builder = builder.contentParameters(Http.parseParameters(content));
         }
+
         String input = headers.getFirst();
-
-
         StringTokenizer parse = new StringTokenizer(input);
-        String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
+        builder = builder.method(Enum.valueOf(Http.Method.class, parse.nextToken().toUpperCase()));
 
         String address = parse.nextToken().toLowerCase();
         StringTokenizer addressTokeniser = new StringTokenizer(address, "?");
-        String mapping = addressTokeniser.nextToken();
+        builder = builder.mapping(addressTokeniser.nextToken());
 
-        List<Parameter> parameterList = null;
         if (addressTokeniser.hasMoreTokens()) {
-            parameterList = Http.parseParameters(addressTokeniser.nextToken());
+            builder = builder.parameters(Http.parseParameters(addressTokeniser.nextToken()));
         }
 
-        return HttpRequest.newBuilder()
-                .method(Enum.valueOf(Http.Method.class, method))
-                .mapping(mapping)
-                .parameters(parameterList)
-                .content(content)
-                .contentParameters(contentParameters)
-                .build();
+        return builder.build();
     }
 
 //    // Create parameters
@@ -166,8 +159,11 @@ public class ClientHandler implements Runnable {
         out.println();
         out.flush();
 
-        dataOut.write(httpResponse.getBody(), 0, httpResponse.getBody().length);
-        dataOut.flush();
+        //FIXME This ok? or hack?
+        if (httpResponse.getMethod() != Http.Method.HEAD) {
+            dataOut.write(httpResponse.getBody(), 0, httpResponse.getBody().length);
+            dataOut.flush();
+        }
     }
 
 }
