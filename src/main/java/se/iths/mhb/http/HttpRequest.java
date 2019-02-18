@@ -1,9 +1,6 @@
 package se.iths.mhb.http;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class HttpRequest {
 
@@ -14,39 +11,16 @@ public class HttpRequest {
     private final String content;
     private final List<Parameter> contentParameters;
 
-//    private void test() {
-//        System.out.println("---->" + mapping);
-//
-//    }
-
-//    String addQueryStringToUrlString(String url, final Map<Object, Object> parameters) throws UnsupportedEncodingException {
-//        if (parameters == null) {
-//            return url;
-//        }
-//
-//        for (Map.Entry<Object, Object> parameter : parameters.entrySet()) {
-//
-//            final String encodedKey = URLEncoder.encode(parameter.getKey().toString(), "UTF-8");
-//            final String encodedValue = URLEncoder.encode(parameter.getValue().toString(), "UTF-8");
-//
-//            if (!url.contains("?")) {
-//                url += "?" + encodedKey + "=" + encodedValue;
-//            } else {
-//                url += "&" + encodedKey + "=" + encodedValue;
-//            }
-//        }
-//
-//        return url;
-//    }
-
     private HttpRequest(Http.Method method, String mapping, Map<String, String> headers,
                         List<Parameter> parameters, String content, List<Parameter> contentParameters) {
+        Objects.requireNonNull(method);
+        Objects.requireNonNull(mapping);
         this.method = method;
         this.mapping = mapping;
-        this.headers = new TreeMap<>(headers);
-        this.parameters = new LinkedList<>(parameters);
-        this.content = content;
-        this.contentParameters = new LinkedList<>(contentParameters);
+        this.headers = (headers != null) ? Collections.unmodifiableMap(headers) : Collections.emptyMap();
+        this.parameters = (parameters != null) ? Collections.unmodifiableList(parameters) : Collections.emptyList();
+        this.content = (content != null) ? content : "";
+        this.contentParameters = (contentParameters != null) ? Collections.unmodifiableList(contentParameters) : Collections.emptyList();
     }
 
     public Http.Method getMethod() {
@@ -89,14 +63,17 @@ public class HttpRequest {
         return new Builder();
     }
 
+    /**
+     * Not Thread-safe.
+     */
     public static class Builder {
 
         private Http.Method method = Http.Method.GET;
-        private String mapping = "/";
-        private Map<String, String> headers = new TreeMap<>();
-        private List<Parameter> parameters = new LinkedList<>();
-        private String content = "";
-        private List<Parameter> contentParameters = new LinkedList<>();
+        private String mapping;
+        private Map<String, String> headers;
+        private List<Parameter> parameters;
+        private String content;
+        private List<Parameter> contentParameters;
 
         private Builder() {
         }
@@ -112,25 +89,28 @@ public class HttpRequest {
         }
 
         public Builder setHeader(String key, String value) {
+            if (this.headers == null)
+                this.headers = new HashMap<>();
             this.headers.put(key, value);
             return this;
         }
 
         public Builder parameters(List<Parameter> parameters) {
-            if (parameters != null)
-                this.parameters.addAll(parameters);
+            if (this.parameters == null)
+                this.parameters = new LinkedList<>();
+            this.parameters.addAll(parameters);
             return this;
         }
 
         public Builder content(String content) {
-            if (content != null)
-                this.content = content;
+            this.content = content;
             return this;
         }
 
         public Builder contentParameters(List<Parameter> contentParameters) {
-            if (contentParameters != null)
-                this.contentParameters.addAll(contentParameters);
+            if (this.contentParameters == null)
+                this.contentParameters = new LinkedList<>();
+            this.contentParameters.addAll(contentParameters);
             return this;
         }
 
