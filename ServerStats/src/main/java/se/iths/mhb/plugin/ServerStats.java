@@ -15,7 +15,7 @@ public class ServerStats implements HttpService {
 
     //todo add api which returns json
 
-    //todo Fix: the javascript sorting is alphabetic atm
+    //FIXME: the javascript sorting is alphabetic atm
 
     @RequestMethod
     public HttpResponse getStatsHtmlPage(HttpRequest httpRequest) {
@@ -23,7 +23,7 @@ public class ServerStats implements HttpService {
         runtimeStorage.getHits().stream()
                 .sorted()
                 .forEach((pageHit) -> stats.append(
-                        "       <tr class=\"item\">\n" +
+                        "<tr class=\"item\">\n" +
                                 "<td><a href=\"" + pageHit.getAddress() + "\">" + pageHit.getAddress() + "</a></td>\n" +
                                 "<td>" + pageHit.getMethod() + "</td>\n" +
                                 "<td>" + pageHit.getCounter() + "</td>\n" +
@@ -32,7 +32,7 @@ public class ServerStats implements HttpService {
         StringBuilder sqlStats = new StringBuilder();
         sqlLiteStorage.getHits()
                 .forEach((pageHit) -> sqlStats.append(
-                        "       <tr class=\"item\">\n" +
+                        "<tr class=\"item\">\n" +
                                 "<td><a href=\"" + pageHit.getAddress() + "\">" + pageHit.getAddress() + "</a></td>\n" +
                                 "<td>" + pageHit.getMethod() + "</td>\n" +
                                 "<td>" + pageHit.getCounter() + "</td>\n" +
@@ -46,7 +46,7 @@ public class ServerStats implements HttpService {
                 "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>" +
                 "    <link rel=\"stylesheet\" href=\"w3.css\">" +
                 "    <link rel=\"stylesheet\" href=\"w3-colors-flat.css\">" +
-                "<script src=\"w3.js\"></script>" +
+                "    <script src=\"w3.js\"></script>" +
                 "    <title>Server Stats</title>\n" +
                 "</head>\n" +
                 "<body style=\"color:#141414; background-color:snow; max-width:750px\">\n" +
@@ -70,6 +70,8 @@ public class ServerStats implements HttpService {
                 "</tbody>\n" +
                 "</table>\n" +
                 "\n" +
+                "<H4>Lifetime Requests</H4>\n" +
+                "\n" +
 
                 "<table class=\"w3-table w3-border w3-striped w3-hoverable\" id=\"statstablesql\">\n" +
                 "<thead class=\"w3-flat-green-sea\">\n" +
@@ -85,7 +87,8 @@ public class ServerStats implements HttpService {
 
                 "</tbody>\n" +
                 "</table>\n" +
-
+                "\n" +
+                "\n" +
 
                 "</div>" +
 
@@ -101,7 +104,6 @@ public class ServerStats implements HttpService {
                 .build();
     }
 
-    //todo Add store to database or store to file
     @ReadRequest
     public void collectStats(HttpRequest httpRequest) {
         runtimeStorage.addHit(httpRequest);
