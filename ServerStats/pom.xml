@@ -15,7 +15,7 @@
             <groupId>se.iths.mhb</groupId>
             <artifactId>WebServer</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
