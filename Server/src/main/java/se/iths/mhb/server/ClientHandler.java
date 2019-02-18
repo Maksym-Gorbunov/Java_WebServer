@@ -10,8 +10,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static se.iths.mhb.server.StaticFileService.errorResponse;
-
 
 /**
  * Instance of this class is created in a new thread for each request to the server.
@@ -150,11 +148,11 @@ public class ClientHandler implements Runnable {
     private HttpResponse handleRequest(HttpRequest httpRequest) {
         var methods = serviceMap.get(httpRequest.getMapping());
         if (methods == null)
-            return errorResponse(404, httpRequest);
+            return StaticFileService.errorResponse(404, httpRequest);
 
         var function = methods.get(httpRequest.getMethod());
         if (function == null)
-            return errorResponse(501, httpRequest);
+            return StaticFileService.errorResponse(501, httpRequest);
 
         return function.apply(httpRequest);
     }

@@ -69,7 +69,7 @@ public class HttpResponse {
     }
 
     /**
-     * Builder for http response
+     * Builder for se.iths.mhb.http response
      */
     public static class Builder {
 

@@ -69,7 +69,7 @@ public class HttpRequest {
     }
 
     /**
-     * Builder for http request
+     * Builder for se.iths.mhb.http request
      * Not Thread-safe, use sequential.
      */
     public static class Builder {
