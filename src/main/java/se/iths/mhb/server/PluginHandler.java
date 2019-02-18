@@ -21,6 +21,12 @@ import java.util.stream.Collectors;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 
+/**
+ * This class Loads all .jar plugins from a directory ("Plugins")
+ * It will reload if new plugin is dropped in the directory.
+ * Plugins have to implement HttpService for now and can use the
+ * annotations address, requestmethod and readrequest for now.
+ */
 public class PluginHandler implements Runnable {
 
     private final Server server;

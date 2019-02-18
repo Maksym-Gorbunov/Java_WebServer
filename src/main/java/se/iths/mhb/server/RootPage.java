@@ -3,6 +3,10 @@ package se.iths.mhb.server;
 import se.iths.mhb.http.HttpRequest;
 import se.iths.mhb.http.HttpResponse;
 
+
+/**
+ * A page with all known address mappings in the server.
+ */
 public class RootPage {
 
     private final Server server;

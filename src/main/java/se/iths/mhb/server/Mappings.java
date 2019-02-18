@@ -9,6 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * The intention of this class is to be an immutable object for thread-safety. With the all the
+ * address mappings and Http request methods to correct Function.
+ */
 public final class Mappings {
     private final Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> ServiceMap;
 

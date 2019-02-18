@@ -5,8 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME) // Make this annotation accessible at runtime via reflection.
-@Target({ElementType.TYPE})       // This annotation can only be applied to class methods.
+/**
+ * Used to map plugin to address.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
 public @interface Address {
     String value() default "/default";
 }

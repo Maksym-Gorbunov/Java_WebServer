@@ -16,6 +16,12 @@ import java.util.stream.Collectors;
 import static java.nio.file.StandardWatchEventKinds.*;
 import static se.iths.mhb.server.Server.*;
 
+/**
+ * The Runnable of this class will load new files from
+ * a directory, even in runtime.
+ * File name will be mapped as it's address.
+ * Also some public static methods to serve files
+ */
 public class StaticFileService implements HttpService, Runnable {
 
     private final Server server;

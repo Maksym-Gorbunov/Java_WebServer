@@ -2,6 +2,11 @@ package se.iths.mhb.http;
 
 import java.util.*;
 
+/**
+ * Represents a Http request
+ * Immutable
+ * Use HttpRequest.newBuilder()to create new instances.
+ */
 public class HttpRequest {
 
     private final Http.Method method;
@@ -64,7 +69,8 @@ public class HttpRequest {
     }
 
     /**
-     * Not Thread-safe.
+     * Builder for http request
+     * Not Thread-safe, use sequential.
      */
     public static class Builder {
 

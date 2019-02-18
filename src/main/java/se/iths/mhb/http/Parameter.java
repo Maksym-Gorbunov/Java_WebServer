@@ -2,6 +2,9 @@ package se.iths.mhb.http;
 
 import java.util.Objects;
 
+/**
+ * A Key value class to be used for parameters
+ */
 public class Parameter {
 
     private final String key;

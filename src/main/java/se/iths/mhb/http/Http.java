@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Util class for common Http cases.
+ */
 public final class Http {
 
     public enum Method {GET, HEAD, POST, PUT, DELETE}

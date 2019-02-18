@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Intention to be an immutable class which holds all the request consumers.
+ */
 public final class RequestConsumers {
 
     private final List<Consumer<HttpRequest>> requestConsumers;

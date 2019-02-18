@@ -4,6 +4,11 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Represents a Http response.
+ * Immutable.
+ * Use Httpresponse.newBuilder() to create new response
+ */
 public class HttpResponse {
 
 
@@ -22,6 +27,7 @@ public class HttpResponse {
         this.parameters = new TreeMap<>(parameters);
         this.body = body;
     }
+
     public Http.Method getMethod() {
         return method;
     }
@@ -62,6 +68,9 @@ public class HttpResponse {
         return new HttpResponse.Builder();
     }
 
+    /**
+     * Builder for http response
+     */
     public static class Builder {
 
         private Http.Method method = Http.Method.GET;

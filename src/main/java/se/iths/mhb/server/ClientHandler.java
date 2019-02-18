@@ -12,6 +12,13 @@ import java.util.function.Function;
 
 import static se.iths.mhb.server.StaticFileService.errorResponse;
 
+
+/**
+ * Instance of this class is created in a new thread for each request to the server.
+ * It will parse and create A HttpRequest object.
+ * Handle the request and create a response.
+ * Send the response.
+ */
 public class ClientHandler implements Runnable {
 
 

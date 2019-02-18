@@ -14,7 +14,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-
+/**
+ * Main thread which listens for new connections.
+ * Also has the address mappings to all static files and plugins.
+ * The mappings and setMappings should be thread-safe
+ */
 public class Server {
 
     static final File WEB_ROOT = new File("WEB-ROOT/static");
