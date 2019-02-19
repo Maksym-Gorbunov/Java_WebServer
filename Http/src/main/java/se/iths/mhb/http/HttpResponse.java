@@ -92,6 +92,9 @@ public class HttpResponse {
 
         public HttpResponse.Builder statusCode(int statusCode) {
             switch (statusCode) {
+                case 200:
+                    this.statusLine += " 200 OK";
+                    break;
                 case 404:
                     this.statusLine += " 404 Not Found";
                     break;
