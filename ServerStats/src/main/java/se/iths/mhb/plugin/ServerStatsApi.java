@@ -2,7 +2,11 @@ package se.iths.mhb.plugin;
 
 import se.iths.mhb.http.*;
 
-@Address("/serverstats/api/v1/")
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Address("/serverstats/api/v1/pagehits")
 public class ServerStatsApi implements HttpService {
 
     private final StatsService statsService;
@@ -14,7 +18,22 @@ public class ServerStatsApi implements HttpService {
     @RequestMethod
     public HttpResponse getStats(HttpRequest httpRequest) {
 
-        String jsonString = "{ address: www, method: GET, counter: 1}";
+        List<Parameter> parameters = httpRequest.getParameters();
+        Optional<Parameter> method = parameters.stream().filter(p -> p.getKey().equals("method")).findAny();
+
+
+        List<PageHit> hits = statsService.getSqlLiteStorage().getHits();
+
+        String jsonString = "[ " + hits.stream()
+                .filter(p -> {
+                    if (method.isPresent())
+                        return p.getMethod().toString().equalsIgnoreCase(method.get().getValue());
+                    return true;
+                })
+                .map(p -> "{ \"address\": \"" + p.getAddress() + "\", \"method\": \"" + p.getMethod() + "\", \"counter\": \"" + p.getCounter() + "\" }"
+
+                ).collect(Collectors.joining(", ")) + " ]";
+
 
         return HttpResponse.newBuilder()
                 .statusCode(200)
