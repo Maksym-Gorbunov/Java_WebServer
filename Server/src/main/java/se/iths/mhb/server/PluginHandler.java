@@ -41,14 +41,15 @@ public class PluginHandler implements Runnable {
         ServiceLoader<HttpService> loader = ServiceLoader.load(HttpService.class, ucl);
         for (HttpService httpService : loader) {
             //mapp address and requestmethods
-            if (httpService.getClass().isAnnotationPresent(Address.class)) {
-                String mapping = httpService.getClass().getAnnotation(Address.class).value();
-                List<Method> methods = Arrays.stream(httpService.getClass().getDeclaredMethods())
-                        .filter(m -> m.isAnnotationPresent(RequestMethod.class))
-                        .collect(Collectors.toList());
 
+            List<Method> methods = Arrays.stream(httpService.getClass().getDeclaredMethods())
+                    //.filter(m -> m.isAnnotationPresent(RequestMethod.class))
+                    .collect(Collectors.toList());
 
-                for (var method : methods) {
+            for (var method : methods) {
+                if (method.isAnnotationPresent(Address.class) && method.isAnnotationPresent(RequestMethod.class)) {
+
+                    String mapping = method.getAnnotation(Address.class).value();
                     Http.Method requestMethod = method.getAnnotation(RequestMethod.class).value();
                     Function<HttpRequest, HttpResponse> responseFunction = httpRequest -> {
                         try {
@@ -58,17 +59,18 @@ public class PluginHandler implements Runnable {
                         }
                         return StaticFileService.errorResponse(500, httpRequest);
                     };
+
                     server.getAddressMapper().set(mapping, requestMethod, responseFunction);
                     counter++;
                 }
             }
 
             //load readrequest consumers
-            List<Method> methods = Arrays.stream(httpService.getClass().getDeclaredMethods())
+            List<Method> consumerMethods = Arrays.stream(httpService.getClass().getDeclaredMethods())
                     .filter(m -> m.isAnnotationPresent(ReadRequest.class))
                     .collect(Collectors.toList());
 
-            for (var method : methods) {
+            for (var method : consumerMethods) {
                 Consumer<HttpRequest> requestConsumer = httpRequest -> {
                     try {
                         method.invoke(httpService, httpRequest);
@@ -76,9 +78,7 @@ public class PluginHandler implements Runnable {
                         e.printStackTrace();
                     }
                 };
-                //server.getRequestConsumers().add(requestConsumer);
                 requestConsumers.add(requestConsumer);
-
             }
         }
         server.getRequestConsumers().set(requestConsumers);

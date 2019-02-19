@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * Used to map plugin to address.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ElementType.METHOD})
 public @interface Address {
     String value() default "/default";
 }

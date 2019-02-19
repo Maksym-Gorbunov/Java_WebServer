@@ -4,8 +4,6 @@ import se.iths.mhb.http.HttpRequest;
 
 public class StatsService {
 
-    static final StatsService statsService = new StatsService();
-
     private final Storage runtimeStorage;
     private final Storage sqlLiteStorage;
 

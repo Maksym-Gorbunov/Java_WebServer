@@ -5,10 +5,11 @@ import se.iths.mhb.http.*;
 
 import java.util.List;
 
-@Address("/simplepostform")
+
 public class SimplePostForm implements HttpService {
 
 
+    @Address("/simplepostform")
     @RequestMethod
     public HttpResponse getMethod(HttpRequest httpRequest) {
         String dynamicDateHtmlPage = "<!DOCTYPE html>\n" +
@@ -42,6 +43,7 @@ public class SimplePostForm implements HttpService {
 
     }
 
+    @Address("/simplepostform")
     @RequestMethod(Http.Method.POST)
     public HttpResponse postMethod(HttpRequest httpRequest) {
         List<Parameter> contentParameters = httpRequest.getContentParameters();

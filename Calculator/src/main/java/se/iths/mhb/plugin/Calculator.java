@@ -4,9 +4,10 @@ import se.iths.mhb.http.*;
 
 import java.io.IOException;
 
-@Address("/calculator")
+
 public class Calculator implements HttpService {
 
+    @Address("/calculator")
     @RequestMethod
     public HttpResponse serve(HttpRequest httpRequest) throws IOException {
         String dynamicDateHtmlPage = "<!DOCTYPE html>\n" +

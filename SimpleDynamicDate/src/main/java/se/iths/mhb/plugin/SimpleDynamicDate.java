@@ -4,9 +4,10 @@ import se.iths.mhb.http.*;
 
 import java.util.Date;
 
-@Address("/date")
+
 public class SimpleDynamicDate implements HttpService {
 
+    @Address("/date")
     @RequestMethod
     public HttpResponse getMethod(HttpRequest httpRequest) {
         String dynamicDateHtmlPage = "<!DOCTYPE html>\n" +

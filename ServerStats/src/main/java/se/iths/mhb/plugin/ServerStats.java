@@ -2,19 +2,22 @@ package se.iths.mhb.plugin;
 
 import se.iths.mhb.http.*;
 
-@Address("/serverstats")
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+
 public class ServerStats implements HttpService {
 
     private final StatsService statsService;
 
     public ServerStats() {
-        this.statsService = StatsService.statsService;
+        this.statsService = new StatsService();
     }
-
-    //todo add api which returns json
 
     //FIXME: the javascript sorting is alphabetic atm
 
+    @Address("/serverstats")
     @RequestMethod
     public HttpResponse getStatsHtmlPage(HttpRequest httpRequest) {
         StringBuilder stats = new StringBuilder();
@@ -108,5 +111,32 @@ public class ServerStats implements HttpService {
 
     }
 
+    @Address("/serverstats/api/v1/pagehits")
+    @RequestMethod
+    public HttpResponse getStats(HttpRequest httpRequest) {
+
+        List<Parameter> parameters = httpRequest.getParameters();
+        Optional<Parameter> method = parameters.stream().filter(p -> p.getKey().equals("method")).findAny();
+
+        List<PageHit> hits = statsService.getSqlLiteStorage().getHits();
+
+        String jsonString = "[ " + hits.stream()
+                .filter(p -> {
+                    if (method.isPresent())
+                        return p.getMethod().toString().equalsIgnoreCase(method.get().getValue());
+                    return true;
+                })
+                .map(p -> "\n   {\n      \"address\": \"" + p.getAddress() + "\",\n      \"method\": \"" + p.getMethod() + "\",\n      \"counter\": \"" + p.getCounter() + "\"\n   }"
+
+                ).collect(Collectors.joining(", ")) + " \n]";
+
+
+        return HttpResponse.newBuilder()
+                .statusCode(200)
+                .setHeader("Content-type", "application/json")
+                .mapping(httpRequest.getMapping())
+                .body(jsonString.getBytes())
+                .build();
+    }
 
 }
