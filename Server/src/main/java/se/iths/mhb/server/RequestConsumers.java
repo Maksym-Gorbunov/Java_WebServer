@@ -2,33 +2,36 @@ package se.iths.mhb.server;
 
 import se.iths.mhb.http.HttpRequest;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Intention to be an immutable class which holds all the request consumers.
+ * Thread-safe
+ * Holder class for request consumers.
  */
 public final class RequestConsumers {
 
-    private final List<Consumer<HttpRequest>> requestConsumers;
+    private List<Consumer<HttpRequest>> requestConsumers;
 
     public RequestConsumers() {
-        this.requestConsumers = Collections.unmodifiableList(new LinkedList<>());
+        this.requestConsumers = Collections.unmodifiableList(new ArrayList<>());
     }
 
-    public RequestConsumers(List<Consumer<HttpRequest>> requestConsumers) {
-        this.requestConsumers = Collections.unmodifiableList(requestConsumers);
+    /**
+     * Removes all currently stored consumers and sets new
+     *
+     * @param consumers new consumers
+     */
+    public synchronized void set(List<Consumer<HttpRequest>> consumers) {
+        requestConsumers = Collections.unmodifiableList(new ArrayList<>(consumers));
     }
 
-    public RequestConsumers add(Consumer<HttpRequest> consumer) {
-        LinkedList<Consumer<HttpRequest>> consumers = new LinkedList<>(requestConsumers);
-        consumers.add(consumer);
-        return new RequestConsumers(consumers);
-    }
-
-    public List<Consumer<HttpRequest>> getRequestConsumers() {
+    /**
+     * @return unmodifiable list of consumers
+     */
+    public final List<Consumer<HttpRequest>> getRequestConsumers() {
         return requestConsumers;
     }
 }

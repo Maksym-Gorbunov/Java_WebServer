@@ -1,13 +1,11 @@
 package se.iths.mhb.server;
 
 import se.iths.mhb.http.Http;
-import se.iths.mhb.http.HttpRequest;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.function.Consumer;
 
 /**
  * Main thread which listens for new connections.
@@ -24,7 +22,7 @@ public class Server {
 
     private final int port;
     private final AddressMapper addressMapper;
-    private RequestConsumers requestConsumers;
+    private final RequestConsumers requestConsumers;
 
     public Server(int port) {
         this.port = port;
@@ -57,25 +55,13 @@ public class Server {
         return addressMapper;
     }
 
-//    public synchronized void set(List<String> mappingList, Function<HttpRequest, HttpResponse> responseFunction) {
-//        HashMap<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> hashMap = new HashMap<>();
-//        mappingList.forEach(string -> {
-//            HashMap<Http.Method, Function<HttpRequest, HttpResponse>> methodMap = new HashMap();
-//            methodMap.put(Http.Method.GET, responseFunction);
-//            methodMap.put(Http.Method.HEAD, responseFunction);
-//            hashMap.put(string, methodMap);
-//        });
-//
-//        mappings = mappings.addServices(hashMap);
-//    }
-
-//    public synchronized void set(String mapping, Http.Method method, Function<HttpRequest, HttpResponse> responseFunction) {
-//        mappings = mappings.addService(mapping, method, responseFunction);
-//    }
-
-    public synchronized void addRequestConsumer(Consumer<HttpRequest> consumer) {
-        requestConsumers = requestConsumers.add(consumer);
+    public RequestConsumers getRequestConsumers() {
+        return requestConsumers;
     }
+
+    //    public synchronized void addRequestConsumer(Consumer<HttpRequest> consumer) {
+//        requestConsumers = requestConsumers.add(consumer);
+//    }
 
     private void startPluginListener() {
         PluginHandler pluginHandler = new PluginHandler(this, "Plugins");

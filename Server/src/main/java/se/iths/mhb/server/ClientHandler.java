@@ -101,46 +101,6 @@ public class ClientHandler implements Runnable {
         return builder.build();
     }
 
-//    // Create parameters
-//    public static List<Parameter> splitQuery(String address) throws UnsupportedEncodingException, MalformedURLException {
-//        URL url = new URL("http://localhost/" + address);
-//        List<Parameter> params = new LinkedList<>();
-//        String query = url.getQuery();
-//        if (query != null) {
-//            String[] pairs = query.split("&");
-//            for (String pair : pairs) {
-//                int idx = pair.indexOf("=");
-//                params.add(new Parameter(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8")));
-//            }
-//        }
-//        return params;
-//    }
-
-    /*
-    private String addQueryStringToUrlString(String url, List<Parameter> parameters) throws UnsupportedEncodingException {
-        System.out.println("************************"+url);
-        if (parameters == null) {
-            return url;
-        }
-        for (Parameter parameter : parameters) {
-            final String encodedKey = URLEncoder.encode(parameter.getKey().toString(), "UTF-8");
-            final String encodedValue = URLEncoder.encode(parameter.getValue().toString(), "UTF-8");
-            if (!url.contains("?")) {
-                url += "?" + encodedKey + "=" + encodedValue;
-            } else {
-                url += "&" + encodedKey + "=" + encodedValue;
-            }
-            parameters.add(new Parameter(encodedKey, encodedValue));
-            System.out.println("****************************");
-            System.out.println(encodedKey+": "+encodedValue);
-            System.out.println("****************************");
-
-        }
-
-        return url;
-    }
-*/
-
     private void consumeRequest(HttpRequest httpRequest) {
         requestConsumers.forEach(consumer -> consumer.accept(httpRequest));
     }

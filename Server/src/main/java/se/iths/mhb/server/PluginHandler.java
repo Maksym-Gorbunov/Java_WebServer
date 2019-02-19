@@ -10,10 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -38,6 +35,7 @@ public class PluginHandler implements Runnable {
     }
 
     private void load() {
+        List<Consumer<HttpRequest>> requestConsumers = new ArrayList<>();
         URLClassLoader ucl = createClassLoader();
         ServiceLoader<HttpService> loader = ServiceLoader.load(HttpService.class, ucl);
         for (HttpService httpService : loader) {
@@ -76,10 +74,12 @@ public class PluginHandler implements Runnable {
                         e.printStackTrace();
                     }
                 };
-                server.addRequestConsumer(requestConsumer);
+                //server.getRequestConsumers().add(requestConsumer);
+                requestConsumers.add(requestConsumer);
+
             }
         }
-
+        server.getRequestConsumers().set(requestConsumers);
     }
 
     private URLClassLoader createClassLoader() {

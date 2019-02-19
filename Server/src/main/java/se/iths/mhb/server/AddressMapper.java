@@ -58,6 +58,9 @@ public final class AddressMapper {
         this.mappings = Collections.unmodifiableMap(hashMap);
     }
 
+    /**
+     * @return unmodifiable map
+     */
     public final Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> getMappings() {
         return mappings;
     }
