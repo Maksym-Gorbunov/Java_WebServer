@@ -48,6 +48,8 @@ public class RootPage {
                 pages.toString() +
 
                 "</div>\n" +
+                "<br>\n" +
+                "<br>\n" +
                 "</div>" +
 
                 "</body>\n" +
