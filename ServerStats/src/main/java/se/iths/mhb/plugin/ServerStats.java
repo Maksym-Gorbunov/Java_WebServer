@@ -5,12 +5,10 @@ import se.iths.mhb.http.*;
 @Address("/serverstats")
 public class ServerStats implements HttpService {
 
-    private final Storage runtimeStorage;
-    private final Storage sqlLiteStorage;
+    private final StatsService statsService;
 
     public ServerStats() {
-        this.runtimeStorage = new RuntimeStorage();
-        this.sqlLiteStorage = new SqlLiteStorage();
+        this.statsService = StatsService.statsService;
     }
 
     //todo add api which returns json
@@ -20,7 +18,7 @@ public class ServerStats implements HttpService {
     @RequestMethod
     public HttpResponse getStatsHtmlPage(HttpRequest httpRequest) {
         StringBuilder stats = new StringBuilder();
-        runtimeStorage.getHits().stream()
+        statsService.getRuntimeStorage().getHits().stream()
                 .sorted()
                 .forEach((pageHit) -> stats.append(
                         "<tr class=\"item\">\n" +
@@ -30,7 +28,7 @@ public class ServerStats implements HttpService {
                                 "</tr>\n"));
 
         StringBuilder sqlStats = new StringBuilder();
-        sqlLiteStorage.getHits()
+        statsService.getSqlLiteStorage().getHits()
                 .forEach((pageHit) -> sqlStats.append(
                         "<tr class=\"item\">\n" +
                                 "<td><a href=\"" + pageHit.getAddress() + "\">" + pageHit.getAddress() + "</a></td>\n" +
@@ -106,8 +104,8 @@ public class ServerStats implements HttpService {
 
     @ReadRequest
     public void collectStats(HttpRequest httpRequest) {
-        runtimeStorage.addHit(httpRequest);
-        sqlLiteStorage.addHit(httpRequest);
+        statsService.add(httpRequest);
+
     }
 
 
