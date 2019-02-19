@@ -21,7 +21,6 @@ public class ServerStatsApi implements HttpService {
         List<Parameter> parameters = httpRequest.getParameters();
         Optional<Parameter> method = parameters.stream().filter(p -> p.getKey().equals("method")).findAny();
 
-
         List<PageHit> hits = statsService.getSqlLiteStorage().getHits();
 
         String jsonString = "[ " + hits.stream()
@@ -30,9 +29,9 @@ public class ServerStatsApi implements HttpService {
                         return p.getMethod().toString().equalsIgnoreCase(method.get().getValue());
                     return true;
                 })
-                .map(p -> "{ \"address\": \"" + p.getAddress() + "\", \"method\": \"" + p.getMethod() + "\", \"counter\": \"" + p.getCounter() + "\" }"
+                .map(p -> "\n   {\n      \"address\": \"" + p.getAddress() + "\",\n      \"method\": \"" + p.getMethod() + "\",\n      \"counter\": \"" + p.getCounter() + "\"\n   }"
 
-                ).collect(Collectors.joining(", ")) + " ]";
+                ).collect(Collectors.joining(", ")) + " \n]";
 
 
         return HttpResponse.newBuilder()
