@@ -4,23 +4,19 @@ package se.iths.mhb.plugin;
 import se.iths.mhb.http.*;
 
 import java.io.*;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.List;
 
 @Address("/calculator")
 public class Calculator implements HttpService {
-    private String htmlPage = "<!DOCTYPE html>\n" +
-            "<html lang=\"en\">\n" +
-            "<head>\n" +
-            "<meta charset=\"UTF-8\">\n" +
-            "<title>Calculator</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "Calculator plugin, error on reading html data\n" +
-            "</body>\n" +
-            "</html>";
+    private String path = System.getProperty("user.dir") + File.separator + "Calculator" + File.separator
+            + "Web" + File.separator;
+    private String htmlPage = "";
+
+    public Calculator(){
+        String def_index = readFile(path + "default_index.html");
+        String styles = "<style>" + readFile(path + "styles.css") + "</style>";
+        htmlPage = def_index + styles + "</body></html>";
+    }
 
     @RequestMethod
     public HttpResponse getMethod(HttpRequest httpRequest) {
@@ -31,8 +27,6 @@ public class Calculator implements HttpService {
                 .mapping(httpRequest.getMapping())
                 .body(htmlPage.getBytes())
                 .build();
-
-
     }
 
     @RequestMethod(Http.Method.POST)
@@ -69,12 +63,10 @@ public class Calculator implements HttpService {
         return "Calculator{}";
     }
     public void setHtmlPage(){
-        String path = System.getProperty("user.dir") + File.separator + "Calculator" + File.separator
-                + "Web" + File.separator;
         String index = readFile(path + "index.html");
         String styles = "<style>" + readFile(path + "styles.css") + "</style>";
         String script = "<script>" + readFile(path + "script.js") + "</script>";
-       htmlPage = index + styles + script + "</body></html>";
+        htmlPage = index + styles + script + "</body></html>";
     }
 
     private String readFile(String path){
