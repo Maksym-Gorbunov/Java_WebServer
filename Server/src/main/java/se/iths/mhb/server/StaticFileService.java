@@ -93,14 +93,14 @@ public class StaticFileService implements HttpService, Runnable {
     private void loadAllStaticFiles() {
         File[] files = Server.WEB_ROOT.listFiles(File::isFile);
         List<String> strings = Arrays.stream(files).map(file -> "/" + file.getName().toLowerCase()).collect(Collectors.toList());
-        server.setMappings(strings, this::serve);
+        server.getAddressMapper().set(strings, this::serve);
     }
 
     @Override
     public void run() {
         System.out.println("Init Static files");
-//        server.setMapping("/", Http.Method.GET, this::serve);
-//        server.setMapping("/", Http.Method.HEAD, this::serve);
+//        server.set("/", Http.Method.GET, this::serve);
+//        server.set("/", Http.Method.HEAD, this::serve);
         loadAllStaticFiles();
 
         try {
@@ -126,7 +126,7 @@ public class StaticFileService implements HttpService, Runnable {
                         if (event.kind() == ENTRY_CREATE) {
                             Object context = event.context();
                             if (context instanceof Path) {
-                                setMapping("/" + context.toString(), staticFileService);
+                                set("/" + context.toString(), staticFileService);
                             }
                         } else if (event.kind() == ENTRY_DELETE) {
 

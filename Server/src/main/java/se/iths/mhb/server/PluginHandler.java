@@ -59,7 +59,7 @@ public class PluginHandler implements Runnable {
                         }
                         return StaticFileService.errorResponse(500, httpRequest);
                     };
-                    server.setMapping(mapping, requestMethod, responseFunction);
+                    server.getAddressMapper().set(mapping, requestMethod, responseFunction);
                 }
             }
 

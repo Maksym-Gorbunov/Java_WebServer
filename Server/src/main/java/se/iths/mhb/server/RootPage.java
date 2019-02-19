@@ -18,8 +18,8 @@ public class RootPage {
     HttpResponse showAllMappingsPage(HttpRequest httpRequest) {
 
         StringBuilder pages = new StringBuilder();
-        server.getMappings()
-                .getServiceMap()
+        server.getAddressMapper()
+                .getMappings()
                 .keySet()
                 .forEach((page) -> pages.append(
                         // "<li>" +
