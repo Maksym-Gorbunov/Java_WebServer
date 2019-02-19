@@ -1,41 +1,93 @@
 package se.iths.mhb.plugin;
 
+
 import se.iths.mhb.http.*;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.List;
 
 @Address("/calculator")
 public class Calculator implements HttpService {
+    private String htmlPage = "<!DOCTYPE html>\n" +
+            "<html lang=\"en\">\n" +
+            "<head>\n" +
+            "<meta charset=\"UTF-8\">\n" +
+            "<title>Calculator</title>\n" +
+            "</head>\n" +
+            "<body>\n" +
+            "Calculator plugin, error on reading html data\n" +
+            "</body>\n" +
+            "</html>";
 
     @RequestMethod
-    public HttpResponse serve(HttpRequest httpRequest) throws IOException {
+    public HttpResponse getMethod(HttpRequest httpRequest) {
+        setHtmlPage();
+        return HttpResponse.newBuilder()
+                .statusCode(200)
+                .setHeader("Content-type", "text/html")
+                .mapping(httpRequest.getMapping())
+                .body(htmlPage.getBytes())
+                .build();
+
+
+    }
+
+    @RequestMethod(Http.Method.POST)
+    public HttpResponse postMethod(HttpRequest httpRequest) {
+        List<Parameter> contentParameters = httpRequest.getContentParameters();
+        var firstName = contentParameters.stream()
+                .filter(parameter -> parameter.getKey().equals("FirstName"))
+                .findFirst();
+        var lastName = contentParameters.stream()
+                .filter(parameter -> parameter.getKey().equals("LastName"))
+                .findFirst();
+
         String dynamicDateHtmlPage = "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
                 "    <meta charset=\"UTF-8\">\n" +
-                "    <title>Title</title>\n" +
+                "    <title>Post Form</title>\n" +
                 "</head>\n" +
                 "<body>\n" +
-
-                "CALCULATOR: \n" +
-
-
+                (firstName.isPresent() ? firstName.get().getValue() : "No FirstName found") + "\n" +
+                (lastName.isPresent() ? lastName.get().getValue() : "No FirstName found") + "\n" +
                 "</body>\n" +
                 "</html>";
-
-
         return HttpResponse.newBuilder()
                 .statusCode(200)
                 .setHeader("Content-type", "text/html")
                 .mapping(httpRequest.getMapping())
                 .body(dynamicDateHtmlPage.getBytes())
                 .build();
-
-
     }
 
     @Override
     public String toString() {
         return "Calculator{}";
+    }
+    public void setHtmlPage(){
+        String path = System.getProperty("user.dir") + File.separator + "Calculator" + File.separator
+                + "Web" + File.separator;
+        String index = readFile(path + "index.html");
+        String styles = "<style>" + readFile(path + "styles.css") + "</style>";
+        String script = "<script>" + readFile(path + "script.js") + "</script>";
+       htmlPage = index + styles + script + "</body></html>";
+    }
+
+    private String readFile(String path){
+        StringBuilder contentBuilder = new StringBuilder();
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(path));
+            String str;
+            while ((str = in.readLine()) != null) {
+                contentBuilder.append(str);
+            }
+            in.close();
+            return contentBuilder.toString();
+        } catch (IOException e) {}
+        return "";
     }
 }

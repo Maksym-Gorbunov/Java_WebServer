@@ -1,8 +1,6 @@
 package se.iths.mhb.plugin;
 
-import se.iths.mhb.http.HttpRequest;
-import se.iths.mhb.http.HttpResponse;
-import se.iths.mhb.http.HttpService;
+import se.iths.mhb.http.*;
 import se.iths.mhb.server.ClientHandler;
 
 import java.io.IOException;
@@ -10,20 +8,15 @@ import java.io.IOException;
 
 // Simple calculator with url arguments input
 // ex. http://localhost:8085/calculator?a=5&b=1&c=add
-
+@Address("/calc")
 public class Calc implements HttpService {
     private int a = 0;
     private int b = 0;
     private String operator = "";
     private String[] operators = new String[]{"add", "sub", "mul", "div"};
 
-    @Override
-    public String defaultMapping() {
-        return "/calc";
-    }
-
-    @Override
-    public HttpResponse serve(HttpRequest httpRequest) throws IOException {
+    @RequestMethod
+    public HttpResponse getMethod(HttpRequest httpRequest) {
         String data = "wrong calc arguments in url";
         if(setParameters()){
             switch (operator){
@@ -69,9 +62,9 @@ public class Calc implements HttpService {
                 "</html>";
 
         return HttpResponse.newBuilder()
-                .statusCode(200)
+                 .statusCode(200)
                 .setHeader("Content-type", "text/html")
-                .mapping(defaultMapping())
+                .mapping(httpRequest.getMapping())
                 .body(dynamicDateHtmlPage.getBytes())
                 .build();
     }

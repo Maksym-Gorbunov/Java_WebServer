@@ -6,7 +6,10 @@ import se.iths.mhb.http.HttpResponse;
 import se.iths.mhb.http.Parameter;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -19,6 +22,7 @@ public class ClientHandler implements Runnable {
     private final Socket connect;
     private final Map<String, Map<Http.Method, Function<HttpRequest, HttpResponse>>> serviceMap;
     private final List<Consumer<HttpRequest>> requestConsumers;
+    public static List<Parameter> parameterList = null;
 
     public ClientHandler(Socket connect, Map<String, Map<Http.Method,
             Function<HttpRequest, HttpResponse>>> serviceMap,
@@ -89,7 +93,7 @@ public class ClientHandler implements Runnable {
         StringTokenizer addressTokeniser = new StringTokenizer(address, "?");
         String mapping = addressTokeniser.nextToken();
 
-        List<Parameter> parameterList = null;
+
         if (addressTokeniser.hasMoreTokens()) {
             parameterList = Http.parseParameters(addressTokeniser.nextToken());
         }
@@ -103,20 +107,20 @@ public class ClientHandler implements Runnable {
                 .build();
     }
 
-//    // Create parameters
-//    public static List<Parameter> splitQuery(String address) throws UnsupportedEncodingException, MalformedURLException {
-//        URL url = new URL("http://localhost/" + address);
-//        List<Parameter> params = new LinkedList<>();
-//        String query = url.getQuery();
-//        if (query != null) {
-//            String[] pairs = query.split("&");
-//            for (String pair : pairs) {
-//                int idx = pair.indexOf("=");
-//                params.add(new Parameter(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8")));
-//            }
-//        }
-//        return params;
-//    }
+    // Create parameters
+    public static List<Parameter> splitQuery(String address) throws UnsupportedEncodingException, MalformedURLException {
+        URL url = new URL("http://localhost/" + address);
+        List<Parameter> params = new LinkedList<>();
+        String query = url.getQuery();
+        if (query != null) {
+            String[] pairs = query.split("&");
+            for (String pair : pairs) {
+                int idx = pair.indexOf("=");
+                params.add(new Parameter(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8")));
+            }
+        }
+        return params;
+    }
 
     /*
     private String addQueryStringToUrlString(String url, List<Parameter> parameters) throws UnsupportedEncodingException {
