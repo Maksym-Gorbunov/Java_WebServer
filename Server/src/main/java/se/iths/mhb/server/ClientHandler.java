@@ -110,7 +110,9 @@ public class ClientHandler implements Runnable {
         if (methods == null)
             return StaticFileService.errorResponse(404, httpRequest);
 
-        var function = methods.get(httpRequest.getMethod());
+        //For now, if HEAD return the GET Function
+        Http.Method method = httpRequest.getMethod();
+        var function = methods.get((method == Http.Method.HEAD) ? Http.Method.GET : method);
         if (function == null)
             return StaticFileService.errorResponse(501, httpRequest);
 
@@ -124,7 +126,7 @@ public class ClientHandler implements Runnable {
         out.println();
         out.flush();
 
-        //FIXME This ok? or hack?
+        //Don't add body if HEAD
         if (httpResponse.getMethod() != Http.Method.HEAD) {
             dataOut.write(httpResponse.getBody(), 0, httpResponse.getBody().length);
             dataOut.flush();

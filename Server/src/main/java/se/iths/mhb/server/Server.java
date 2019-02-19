@@ -31,7 +31,6 @@ public class Server {
     public void start() {
         RootPage rootPage = new RootPage(this);
         addressMapper.set("/", Http.Method.GET, rootPage::showAllMappingsPage);
-        addressMapper.set("/", Http.Method.HEAD, rootPage::showAllMappingsPage);
         startStaticFileListener();
         startPluginListener();
         try {
