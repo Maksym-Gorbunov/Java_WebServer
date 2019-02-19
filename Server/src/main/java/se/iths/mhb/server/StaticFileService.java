@@ -106,11 +106,11 @@ public class StaticFileService implements Runnable {
         File[] files = Server.WEB_ROOT.listFiles(File::isFile);
         List<String> strings = Arrays.stream(files).map(file -> "/" + file.getName().toLowerCase()).collect(Collectors.toList());
         server.getAddressMapper().set(strings, this::serve);
+        System.out.println("Mapped " + strings.size() + " files to addresses");
     }
 
     @Override
     public void run() {
-        System.out.println("Init Static files");
         loadAllStaticFiles();
 
         try {

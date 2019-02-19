@@ -35,7 +35,7 @@ public class Server {
         startPluginListener();
         try {
             ServerSocket serverConnect = new ServerSocket(port);
-            System.out.println("Server started.\nListening for connections on port : " + port + " ...\n");
+            System.out.println("Server started on port : " + port);
 
             while (true) {
                 Socket socket = serverConnect.accept();

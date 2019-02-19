@@ -35,6 +35,7 @@ public class PluginHandler implements Runnable {
     }
 
     private void load() {
+        int counter = 0;
         List<Consumer<HttpRequest>> requestConsumers = new ArrayList<>();
         URLClassLoader ucl = createClassLoader();
         ServiceLoader<HttpService> loader = ServiceLoader.load(HttpService.class, ucl);
@@ -58,6 +59,7 @@ public class PluginHandler implements Runnable {
                         return StaticFileService.errorResponse(500, httpRequest);
                     };
                     server.getAddressMapper().set(mapping, requestMethod, responseFunction);
+                    counter++;
                 }
             }
 
@@ -80,6 +82,8 @@ public class PluginHandler implements Runnable {
             }
         }
         server.getRequestConsumers().set(requestConsumers);
+        System.out.println("Mapped " + counter + " addresses from plugins");
+        System.out.println("Loaded " + server.getRequestConsumers().getRequestConsumers().size() + " request consumers from plugins");
     }
 
     private URLClassLoader createClassLoader() {
@@ -98,7 +102,6 @@ public class PluginHandler implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Init Plugins");
         load();
         try {
             WatchService watchService = FileSystems.getDefault().newWatchService();
