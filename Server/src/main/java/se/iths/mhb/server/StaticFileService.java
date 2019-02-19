@@ -3,7 +3,6 @@ package se.iths.mhb.server;
 import se.iths.mhb.http.Http;
 import se.iths.mhb.http.HttpRequest;
 import se.iths.mhb.http.HttpResponse;
-import se.iths.mhb.http.HttpService;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +21,7 @@ import static se.iths.mhb.server.Server.*;
  * File name will be mapped as it's address.
  * Also some public static methods to serve files
  */
-public class StaticFileService implements HttpService, Runnable {
+public class StaticFileService implements Runnable {
 
     private final Server server;
 
@@ -37,12 +36,18 @@ public class StaticFileService implements HttpService, Runnable {
         } else {
             fileRequested = fileRequested.replaceFirst("/", "");
         }
-        // System.out.println(fileRequested);
         return response(200, fileRequested, httpRequest);
-
     }
 
 
+    /**
+     * Create http response for a file.
+     *
+     * @param code          status code
+     * @param fileRequested file
+     * @param httpRequest   http request
+     * @return HttpResponse
+     */
     public static HttpResponse response(int code, String fileRequested, HttpRequest httpRequest) {
         File file = new File(Server.WEB_ROOT, fileRequested);
         int fileLength = (int) file.length();
@@ -65,6 +70,13 @@ public class StaticFileService implements HttpService, Runnable {
 
     }
 
+    /**
+     * Create error http response.
+     * Supporeted codes: 404, 501, 500.
+     * @param code status code
+     * @param httpRequest http request
+     * @return HttpResponse
+     */
     public static HttpResponse errorResponse(int code, HttpRequest httpRequest) {
         String fileRequested = "";
         switch (code) {
@@ -99,8 +111,6 @@ public class StaticFileService implements HttpService, Runnable {
     @Override
     public void run() {
         System.out.println("Init Static files");
-//        server.set("/", Http.Method.GET, this::serve);
-//        server.set("/", Http.Method.HEAD, this::serve);
         loadAllStaticFiles();
 
         try {

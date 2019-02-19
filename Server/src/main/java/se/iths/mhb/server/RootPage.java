@@ -5,7 +5,7 @@ import se.iths.mhb.http.HttpResponse;
 
 
 /**
- * A page with all known address mappings in the server.
+ * A page that will display all known address mappings in the server.
  */
 public class RootPage {
 

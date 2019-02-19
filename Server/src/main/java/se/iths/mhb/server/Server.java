@@ -10,7 +10,6 @@ import java.net.Socket;
 /**
  * Main thread which listens for new connections.
  * Also has the address mappings to all static files and plugins.
- * The mappings and set should be thread-safe
  */
 public class Server {
 
@@ -18,7 +17,6 @@ public class Server {
     static final String DEFAULT_FILE = "index.html";
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "501.html";
-
 
     private final int port;
     private final AddressMapper addressMapper;
@@ -58,10 +56,6 @@ public class Server {
     public RequestConsumers getRequestConsumers() {
         return requestConsumers;
     }
-
-    //    public synchronized void addRequestConsumer(Consumer<HttpRequest> consumer) {
-//        requestConsumers = requestConsumers.add(consumer);
-//    }
 
     private void startPluginListener() {
         PluginHandler pluginHandler = new PluginHandler(this, "Plugins");
