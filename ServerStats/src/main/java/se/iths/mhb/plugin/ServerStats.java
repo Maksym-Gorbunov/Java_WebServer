@@ -42,9 +42,9 @@ public class ServerStats implements HttpService {
                 "<head>\n" +
                 "    <meta charset=\"UTF-8\">\n" +
                 "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>" +
-                "    <link rel=\"stylesheet\" href=\"w3.css\">" +
-                "    <link rel=\"stylesheet\" href=\"w3-colors-flat.css\">" +
-                "    <script src=\"w3.js\"></script>" +
+                "    <link rel=\"stylesheet\" href=\"/w3.css\">" +
+                "    <link rel=\"stylesheet\" href=\"/w3-colors-flat.css\">" +
+                "    <script src=\"/w3.js\"></script>" +
                 "    <title>Server Stats</title>\n" +
                 "</head>\n" +
                 "<body style=\"color:#141414; background-color:snow; max-width:750px\">\n" +

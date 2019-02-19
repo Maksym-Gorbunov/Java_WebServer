@@ -51,17 +51,22 @@ public class StaticFileService implements Runnable {
     public static HttpResponse response(int code, String fileRequested, HttpRequest httpRequest) {
         File file = new File(Server.WEB_ROOT, fileRequested);
         int fileLength = (int) file.length();
-        String content = Http.getContentType(fileRequested.substring(fileRequested.lastIndexOf(".")));
+        String suffix = fileRequested.substring(fileRequested.lastIndexOf("."));
+        String content = Http.getContentType(suffix);
 
         try {
             byte[] body = readFileData(file, fileLength);
-            return HttpResponse.newBuilder()
+            HttpResponse.Builder builder = HttpResponse.newBuilder()
                     .statusCode(code)
                     .setHeader("Content-type", content)
                     .setHeader("Content-length", "" + fileLength)
                     .mapping(httpRequest.getMapping())
-                    .body(body)
-                    .build();
+                    .body(body);
+            if (suffix.toLowerCase().equals(".ico") || suffix.toLowerCase().equals(".css")) {
+                builder.setHeader("Cache-Control", "max-age=3600");
+            }
+
+            return builder.build();
         } catch (IOException e) {
             e.printStackTrace();
             return errorResponse(404, httpRequest);
@@ -73,7 +78,8 @@ public class StaticFileService implements Runnable {
     /**
      * Create error http response.
      * Supporeted codes: 404, 501, 500.
-     * @param code status code
+     *
+     * @param code        status code
      * @param httpRequest http request
      * @return HttpResponse
      */
