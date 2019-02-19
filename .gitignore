@@ -2,3 +2,6 @@
 target
 *.iml
 Plugins
+Server/dependency-reduced-pom.xml
+/*.jar
+DB
