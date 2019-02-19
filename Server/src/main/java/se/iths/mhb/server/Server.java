@@ -6,7 +6,7 @@ import se.iths.mhb.http.HttpRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.concurrent.CompletableFuture;
+import java.net.Socket;
 import java.util.function.Consumer;
 
 /**
@@ -33,7 +33,6 @@ public class Server {
     }
 
     public void start() {
-        //todo read some config file for port and if specify plugin to specific mapping
         RootPage rootPage = new RootPage(this);
         addressMapper.set("/", Http.Method.GET, rootPage::showAllMappingsPage);
         addressMapper.set("/", Http.Method.HEAD, rootPage::showAllMappingsPage);
@@ -44,7 +43,9 @@ public class Server {
             System.out.println("Server started.\nListening for connections on port : " + port + " ...\n");
 
             while (true) {
-                CompletableFuture.runAsync(new ClientHandler(serverConnect.accept(), addressMapper.getMappings(), requestConsumers.getRequestConsumers()));
+                Socket socket = serverConnect.accept();
+                Thread thread = new Thread(new ClientHandler(socket, addressMapper.getMappings(), requestConsumers.getRequestConsumers()));
+                thread.start();
             }
         } catch (IOException e) {
             System.err.println("Server Connection error : " + e.getMessage());
