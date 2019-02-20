@@ -17,11 +17,6 @@
             <version>1.0</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>net.sourceforge.fuzzyservices</groupId>
-            <artifactId>fuzzyservices-beans</artifactId>
-            <version>1.0</version>
-        </dependency>
     </dependencies>
 
     <build>
