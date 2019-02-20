@@ -6,7 +6,7 @@ import se.iths.mhb.http.*;
 import java.io.*;
 import java.util.List;
 
-@Address("/calculator")
+
 public class Calculator implements HttpService {
     private String path = System.getProperty("user.dir") + File.separator + "Calculator" + File.separator
             + "Web" + File.separator;
@@ -18,6 +18,7 @@ public class Calculator implements HttpService {
         htmlPage = def_index + styles + "</body></html>";
     }
 
+    @Address("/calculator")
     @RequestMethod
     public HttpResponse getMethod(HttpRequest httpRequest) {
         setHtmlPage();
