@@ -12,6 +12,7 @@ html {
     top: 0;
     right: 0;
     max-width: 8em;
+    opacity: 1;
 }
 
 body {
@@ -33,8 +34,9 @@ h1 {
     -webkit-text-fill-color: transparent;
     color: #8c5059;
     font-weight: 400;
-    margin: 0 auto 6em;
+    margin: 0 auto 2em;
     max-width: 9em;
+    max-height: 2em;
 }
 
 .calculator {
@@ -131,8 +133,9 @@ button::after {
      color: #100a1c;
 }
 .show {
-     top: 20em;
-     animation: fadein 4s;
+    outline: 1px solid #af1313;
+    top: 20em;
+    animation: fadein 4s;
 }
 
 @keyframes zoom {
